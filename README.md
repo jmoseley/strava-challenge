@@ -1,4 +1,4 @@
-# strava-challenge
+# strava-challenge [![Build Status](https://travis-ci.org/jmoseley/strava-challenge.svg?branch=master)](https://travis-ci.org/jmoseley/strava-challenge)
 Create public/private challenges for you and your friends.
 
 ## Local Development
