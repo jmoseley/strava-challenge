@@ -5,7 +5,7 @@
   "main": "dist/start.js",
   "scripts": {
     "start": "./scripts/start.sh",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "./scripts/test.sh",
     "compile": "./scripts/compile.sh"
   },
   "repository": {
@@ -17,6 +17,20 @@
     "training",
     "exercise"
   ],
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(src/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
   "author": "Jeremy Moseley",
   "license": "MIT",
   "bugs": {
@@ -25,6 +39,9 @@
   "homepage": "https://github.com/jmoseley/strava-challenge#readme",
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^22.0.0",
+    "jest": "^22.0.4",
+    "ts-jest": "^22.0.0",
     "typescript": "^2.6.2"
   }
 }
