@@ -4,6 +4,7 @@ import * as Router from 'express-promise-router';
 import { config } from './config'; 
 
 import { getLogger } from './logger';
+import { Server } from 'net';
 
 const LOG = getLogger('main');
 
@@ -17,9 +18,18 @@ export async function main() {
   app.use(router);
 
   const PORT = config.get('port') as number;
-  app.listen(PORT, () => {
-    LOG.info(`Server started on port ${PORT}.`);
+
+  // Promisify.
+  const listenPromise = new Promise<Server>((resolve, reject) => {
+    const server = app.listen(PORT, () => {
+      LOG.info(`Server started on port ${PORT}.`);
+      resolve(server);
+    });
   });
+
+  return listenPromise;
 }
 
-main();
+if (config.get('env') !== 'test') {
+  main();
+}
