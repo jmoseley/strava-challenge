@@ -1,3 +1,3 @@
 #!/bin/sh
 
-jest
+NODE_ENV=test jest
