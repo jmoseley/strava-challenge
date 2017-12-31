@@ -2,4 +2,4 @@
 
 npm run compile
 
-node ./dist/start.js
+jest
