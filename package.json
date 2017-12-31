@@ -1,0 +1,24 @@
+{
+  "name": "strava-challenge",
+  "version": "1.0.0",
+  "description": "Allow users to create private challenges and share them with their friends.",
+  "main": "dist/start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmoseley/strava-challenge.git"
+  },
+  "keywords": [
+    "strava",
+    "training",
+    "exercise"
+  ],
+  "author": "Jeremy Moseley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jmoseley/strava-challenge/issues"
+  },
+  "homepage": "https://github.com/jmoseley/strava-challenge#readme"
+}
