@@ -4,6 +4,7 @@
   "description": "Allow users to create private challenges and share them with their friends.",
   "main": "dist/start.js",
   "scripts": {
+    "clean": "./scripts/clean.sh",
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
     "compile": "./scripts/compile.sh"
