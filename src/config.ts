@@ -13,6 +13,12 @@ export const config = convict({
     default: 8765,
     env: 'PORT'
   },
+  root_url: {
+    doc: 'Root URL to access the application. EG http://strava-challenge.jeremymoseley.net',
+    format: '*',
+    default: null,
+    env: 'ROOT_URL',
+  },
   strava: {
     access_token: {
       doc: 'The Strava App Access Token',
@@ -32,12 +38,6 @@ export const config = convict({
       format: '*',
       env: 'STRAVA_CLIENT_SECRET',
       sensitive: true,
-      default: null,
-    },
-    redirect_uri: {
-      doc: 'The Strava OAuth redirect URI',
-      format: '*',
-      env: 'STRAVA_REDIRECT_URI',
       default: null,
     },
   },
