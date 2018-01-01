@@ -20,7 +20,10 @@ html
     title Challenge
   body
     h1 Challenge
-    a(href=`${strava_auth_url}`)
-      img(src="/imgs/btn_strava_connectwith_orange@2x.png", alt="Connect With Strava")
+    if user
+      h2 Welcome #{user.displayName}!
+    else
+      a(href=`/auth/strava`)
+        img(src="/imgs/btn_strava_connectwith_orange@2x.png", alt="Connect With Strava")
 
 

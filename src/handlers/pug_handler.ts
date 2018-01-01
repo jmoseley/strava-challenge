@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as express from 'express';
 
 import { config } from '../config';
@@ -7,11 +8,11 @@ const strava = require('strava-v3');
 
 export async function index(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PageHandler/Index');
-  log.info(`Rendering index.`);
-  log.info('strava', config.get('strava'));
-  const strava_auth_url = strava.oauth.getRequestAccessURL(config.get('strava'));
-  log.info('strava_auth_url', { strava_auth_url });
-  res.render('index', {
-    strava_auth_url,
-  });
+
+  let user;
+  if (_.get(req.session, 'passport.user')) {
+    log.info(`Found user session.`, { displayName: req.session.passport.user.displayName });
+    user = req.session.passport.user;
+  }
+  res.render('index', { user });
 }
