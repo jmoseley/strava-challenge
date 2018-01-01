@@ -1,10 +1,10 @@
 import * as express from 'express';
 import * as Router from 'express-promise-router';
-
-import { config } from './config'; 
-
-import { getLogger, middleware as loggerMiddleware } from './logger';
 import { Server } from 'net';
+
+import * as pugHandler from './handlers/pug_handler';
+import { config } from './config'; 
+import { getLogger, middleware as loggerMiddleware } from './logger';
 
 const LOG = getLogger('main');
 
@@ -13,8 +13,12 @@ export async function main() {
   LOG.info('Starting server...');
   const app: express.Application = express();
   app.use(loggerMiddleware());
+  app.set('view engine', 'pug');
+  app.use(express.static('./public'));
+  app.set('views', './views');
 
   const router = Router();
+  router.get('/', pugHandler.index);
 
   app.use(router);
 

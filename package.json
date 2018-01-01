@@ -4,6 +4,7 @@
   "description": "Allow users to create private challenges and share them with their friends.",
   "main": "dist/start.js",
   "scripts": {
+    "dev": "./scripts/dev.sh",
     "clean": "./scripts/clean.sh",
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
@@ -54,6 +55,7 @@
     "@types/pug": "^2.0.4",
     "@types/shortid": "0.0.29",
     "@types/winston": "^2.3.7",
+    "forever": "^0.15.3",
     "jest": "^22.0.4",
     "ts-jest": "^22.0.0",
     "typescript": "^2.6.2"
