@@ -8,6 +8,7 @@ import { Server } from 'net';
 import * as pugHandler from './handlers/pug_handler';
 import { config } from './config';
 import { getLogger, middleware as loggerMiddleware } from './logger';
+import { getSessionStore } from './lib/session_store';
 
 const LOG = getLogger('main');
 
@@ -21,12 +22,10 @@ const StravaStrategy = require('passport-strava-oauth2').Strategy;
 //   have a database of user records, the complete Strava profile is
 //   serialized and deserialized.
 passport.serializeUser(function(user, done) {
-  LOG.info(`Serialize User`, { user });
   done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
-  LOG.info(`Deserialize User`, { obj });
   done(null, obj);
 });
 
@@ -56,8 +55,12 @@ export async function main() {
   app.use(express.static('./public'));
   app.set('views', './views');
   app.use(cookieParser(config.get('secret')));
-  // TODO: Store the sessions somewhere: https://www.npmjs.com/package/dynamodb-store
-  app.use(expressSession({ secret: config.get('secret'), saveUninitialized: false, resave: false }));
+  app.use(expressSession({
+    store: getSessionStore(),
+    secret: config.get('secret'),
+    saveUninitialized: false,
+    resave: false,
+  }));
   app.use(passport.initialize());
   app.use(passport.session());
 

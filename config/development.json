@@ -1,6 +1,7 @@
 {
   "root_url": "http://localhost:8765",
   "secret": "I'm a little teapot",
+  "storage_type": "file",
   "strava": {
     "client_id": "22338",
     "client_secret": "f5d305c4042f06303d523b57ef5ff34247c7dd9b",
