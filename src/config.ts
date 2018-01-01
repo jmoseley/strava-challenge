@@ -19,6 +19,12 @@ export const config = convict({
     default: null,
     env: 'ROOT_URL',
   },
+  secret: {
+    doc: 'The secret string used to secure cookies.',
+    format: '*',
+    default: undefined,
+    env: 'COOKIE_SECRET',
+  },
   strava: {
     access_token: {
       doc: 'The Strava App Access Token',

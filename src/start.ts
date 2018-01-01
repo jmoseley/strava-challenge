@@ -1,3 +1,4 @@
+import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as Router from 'express-promise-router';
 import * as passport from 'passport';
@@ -53,6 +54,7 @@ export async function main() {
   app.set('view engine', 'pug');
   app.use(express.static('./public'));
   app.set('views', './views');
+  app.use(cookieParser(config.get('secret')));
 
   const router = Router();
   router.get('/', pugHandler.index);
