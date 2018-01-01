@@ -3,7 +3,7 @@ import * as Router from 'express-promise-router';
 
 import { config } from './config'; 
 
-import { getLogger } from './logger';
+import { getLogger, middleware as loggerMiddleware } from './logger';
 import { Server } from 'net';
 
 const LOG = getLogger('main');
@@ -12,6 +12,7 @@ const LOG = getLogger('main');
 export async function main() {
   LOG.info('Starting server...');
   const app: express.Application = express();
+  app.use(loggerMiddleware());
 
   const router = Router();
 
