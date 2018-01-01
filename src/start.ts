@@ -1,6 +1,7 @@
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as Router from 'express-promise-router';
+import * as expressSession from 'express-session';
 import * as passport from 'passport';
 import { Server } from 'net';
 
@@ -55,6 +56,10 @@ export async function main() {
   app.use(express.static('./public'));
   app.set('views', './views');
   app.use(cookieParser(config.get('secret')));
+  // TODO: Store the sessions somewhere: https://www.npmjs.com/package/dynamodb-store
+  app.use(expressSession({ secret: config.get('secret'), saveUninitialized: false, resave: false }));
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   const router = Router();
   router.get('/', pugHandler.index);
