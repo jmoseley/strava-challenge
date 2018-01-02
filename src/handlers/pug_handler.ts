@@ -4,7 +4,7 @@ import * as express from 'express';
 import { config } from '../config';
 
 // TODO: Types.
-const strava = require('strava-v3');
+// const strava = require('strava-v3');
 
 export async function index(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PageHandler/Index');
