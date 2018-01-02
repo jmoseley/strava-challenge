@@ -80,6 +80,8 @@ export async function main() {
     passport.authenticate('strava', { failureRedirect: '/' }),
     authHandler.callback,
   );
+  // TODO: Should we clear the users access token?
+  app.get('/logout', authHandler.logout);
 
   app.use(router);
 

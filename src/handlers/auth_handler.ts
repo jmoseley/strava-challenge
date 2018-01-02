@@ -19,7 +19,7 @@ export async function callback(req: any, res: any, next: any) {
       // Successful authentication, save the user, redirect home.
       const createOptions = {
         displayName: userFromSession.displayName,
-        accessToken: userFromSession.accessToken,
+        accessToken: userFromSession.token,
         provider: userFromSession.provider,
         providerId: userFromSession.id,
       };
@@ -33,4 +33,11 @@ export async function callback(req: any, res: any, next: any) {
     // TODO: Nice errors for the user.
     throw new Error(`Did not get a user back.`);
   }
+}
+
+export function logout(req: any, res: any) {
+  req.logout();
+  req.session.destroy(() => {
+    res.redirect('/'); //Inside a callback… bulletproof!
+  });
 }

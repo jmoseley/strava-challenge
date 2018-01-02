@@ -9,10 +9,9 @@ import { config } from '../config';
 export async function index(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PageHandler/Index');
 
-  let user;
-  if (_.get(req.session, 'passport.user')) {
-    log.info(`Found user session.`, { displayName: req.session.passport.user.displayName });
-    user = req.session.passport.user;
+  const user = _.get(req, 'session.user');
+  if (user) {
+    log.debug(`Found user in session.`, { displayName: user.displayName });
   }
   res.render('index', { user });
 }

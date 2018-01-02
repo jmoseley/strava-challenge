@@ -23,9 +23,7 @@ export default class UserDAO extends WithLog {
   }
 
   public async findUser(provider: string, providerId: string): Promise<User|null> {
-    const userResult = await this.collection().findOne({ provider, providerId });
-
-    return userResult.value || null;
+    return await this.collection().findOne({ provider, providerId });
   }
 
   public async create(userCreateOptions:UserCreateOptions): Promise<User> {
