@@ -1,4 +1,7 @@
 {
+  "mongodb": {
+    "url": "mongodb://localhost:27017/challenge"
+  },
   "root_url": "http://localhost:8765",
   "secret": "I'm a little teapot",
   "storage_type": "file",
