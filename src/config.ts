@@ -7,6 +7,14 @@ export const config = convict({
     default: 'development',
     env: 'NODE_ENV'
   },
+  mongodb: {
+    url: {
+      doc: 'Address for MongoDB connection. Contains the username and password.',
+      format: '*',
+      default: undefined,
+      env: 'MONGODB_URL',
+    },
+  },
   port: {
     doc: 'The port to bind.',
     format: 'port',
@@ -28,7 +36,7 @@ export const config = convict({
   storage_type: {
     doc: 'The type of storage to use.',
     // TODO: Add persistent type, like DynamoDB.
-    format: ['file'],
+    format: ['file', 'mongodb'],
     default: 'file',
   },
   strava: {
