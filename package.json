@@ -57,6 +57,7 @@
     "express-promise-router": "^2.0.0",
     "express-session": "^1.15.6",
     "lodash": "^4.17.4",
+    "mongodb": "^3.0.1",
     "passport": "^0.4.0",
     "passport-strava-oauth2": "^0.1.3",
     "pug": "^2.0.0-rc.4",
