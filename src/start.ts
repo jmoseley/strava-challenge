@@ -1,3 +1,6 @@
+// Before anything, boot.
+import './lib/boot';
+
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as Router from 'express-promise-router';
