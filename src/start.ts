@@ -6,6 +6,7 @@ import * as express from 'express';
 import * as Router from 'express-promise-router';
 import * as expressSession from 'express-session';
 import * as passport from 'passport';
+import * as morgan from 'morgan';
 import { Server } from 'net';
 
 import * as pugHandler from './handlers/pug_handler';
@@ -55,6 +56,7 @@ passport.use(new StravaStrategy({
 export async function main() {
   LOG.info('Starting server...');
   const app: express.Application = express();
+  app.use(morgan('tiny'));
   app.use(loggerMiddleware());
   app.set('view engine', 'pug');
   app.use(express.static('./public'));
