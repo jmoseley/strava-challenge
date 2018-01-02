@@ -2,6 +2,14 @@ import * as express from 'express';
 import * as shortid from 'shortid';
 import * as winston from 'winston';
 
+export class WithLog {
+  protected readonly log: LoggerInstance;
+
+  constructor(loggerFactory: LoggerFactory) {
+    this.log = loggerFactory.getLogger(this.constructor.name);
+  }
+}
+
 function createTransports(loggerName?: string): winston.TransportInstance[] {
   const transports = [
     new winston.transports.Console({
