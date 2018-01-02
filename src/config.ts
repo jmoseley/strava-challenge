@@ -9,22 +9,10 @@ export const config = convict({
   },
   mongodb: {
     url: {
-      doc: 'Address for MongoDB connection',
+      doc: 'Address for MongoDB connection. Contains the username and password.',
       format: '*',
       default: undefined,
       env: 'MONGODB_URL',
-    },
-    user: {
-      doc: 'MongoDB username',
-      format: '*',
-      default: undefined,
-      env: 'MONGODB_USER',
-    },
-    pass: {
-      doc: 'MongoDB password',
-      format: '*',
-      default: undefined,
-      env: 'MONGODB_PASSWORD',
     },
   },
   port: {
