@@ -12,6 +12,7 @@ import * as pugHandler from './handlers/pug_handler';
 import { config } from './config';
 import { getLogger, middleware as loggerMiddleware } from './logger';
 import { getSessionStore } from './lib/session_store';
+import { middleware as dbMiddleware } from './lib/db';
 
 const LOG = getLogger('main');
 
@@ -66,6 +67,7 @@ export async function main() {
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(await dbMiddleware());
 
   const router = Router();
   router.get('/', pugHandler.index);

@@ -14,6 +14,12 @@ export const config = convict({
       default: undefined,
       env: 'MONGODB_URL',
     },
+    dbName: {
+      doc: 'The name of the db to use. This should match the DB name specified in the URL above.',
+      format: '*',
+      default: 'challenge',
+      env: 'MONGODB_DB_NAME',
+    }
   },
   port: {
     doc: 'The port to bind.',
