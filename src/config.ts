@@ -23,7 +23,7 @@ export const config = convict({
     doc: 'The secret string used to secure cookies.',
     format: '*',
     default: undefined,
-    env: 'COOKIE_SECRET',
+    env: 'SECRET',
   },
   storage_type: {
     doc: 'The type of storage to use.',
