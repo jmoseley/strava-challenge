@@ -10,7 +10,7 @@ export const config = convict({
   mongodb: {
     url: {
       doc: 'Address for MongoDB connection',
-      format: 'url',
+      format: '*',
       default: undefined,
       env: 'MONGODB_URL',
     },
