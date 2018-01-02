@@ -40,6 +40,16 @@
   },
   "homepage": "https://github.com/jmoseley/strava-challenge#readme",
   "dependencies": {
+    "@types/convict": "^4.1.1",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.11.0",
+    "@types/express-promise-router": "^2.0.0",
+    "@types/express-session": "^1.15.6",
+    "@types/lodash": "^4.14.91",
+    "@types/passport": "^0.4.2",
+    "@types/pug": "^2.0.4",
+    "@types/shortid": "0.0.29",
+    "@types/winston": "^2.3.7",
     "convict": "^4.0.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
@@ -52,23 +62,13 @@
     "session-file-store": "^1.2.0",
     "shortid": "^2.2.8",
     "strava-v3": "^1.14.0",
+    "typescript": "^2.6.2",
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "@types/convict": "^4.1.1",
-    "@types/cookie-parser": "^1.4.1",
-    "@types/express": "^4.11.0",
-    "@types/express-promise-router": "^2.0.0",
-    "@types/express-session": "^1.15.6",
     "@types/jest": "^22.0.0",
-    "@types/lodash": "^4.14.91",
-    "@types/passport": "^0.4.2",
-    "@types/pug": "^2.0.4",
-    "@types/shortid": "0.0.29",
-    "@types/winston": "^2.3.7",
     "forever": "^0.15.3",
     "jest": "^22.0.4",
-    "ts-jest": "^22.0.0",
-    "typescript": "^2.6.2"
+    "ts-jest": "^22.0.0"
   }
 }
