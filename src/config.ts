@@ -33,12 +33,6 @@ export const config = convict({
     default: undefined,
     env: 'SECRET',
   },
-  storage_type: {
-    doc: 'The type of storage to use.',
-    // TODO: Add persistent type, like DynamoDB.
-    format: ['file', 'mongodb'],
-    default: 'file',
-  },
   strava: {
     access_token: {
       doc: 'The Strava App Access Token',
