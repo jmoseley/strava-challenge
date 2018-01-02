@@ -1,5 +1,6 @@
 {
   "port": "8766",
+  "secret": "This is not a secret",
   "strava": {
     "client_id": "22336",
     "client_secret": "this is not a secret"
