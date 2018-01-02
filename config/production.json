@@ -1,1 +1,7 @@
-{}
+{
+  "root_url": "http://challenge.jeremymoseley.net",
+  "storage_type": "file",
+  "strava": {
+    "client_id": "22336"
+  }
+}
