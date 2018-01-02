@@ -2,6 +2,8 @@ import * as express from 'express';
 import * as shortid from 'shortid';
 import * as winston from 'winston';
 
+import { config } from './config';
+
 export class WithLog {
   protected readonly log: LoggerInstance;
 
@@ -14,6 +16,7 @@ function createTransports(loggerName?: string): winston.TransportInstance[] {
   const transports = [
     new winston.transports.Console({
       label: loggerName,
+      level: config.get('log_level'),
      }),
   ];
   // TODO: Sentry

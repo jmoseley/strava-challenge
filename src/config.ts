@@ -7,6 +7,12 @@ export const config = convict({
     default: 'development',
     env: 'NODE_ENV'
   },
+  log_level: {
+    doc: 'Logging level',
+    format: ['error', 'warn', 'info', 'debug'],
+    env: 'LOG_LEVEL',
+    default: 'info',
+  },
   mongodb: {
     url: {
       doc: 'Address for MongoDB connection. Contains the username and password.',

@@ -1,4 +1,5 @@
 {
+  "log_level": "debug",
   "mongodb": {
     "url": "mongodb://localhost:27017/challenge"
   },
