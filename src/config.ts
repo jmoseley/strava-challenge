@@ -7,6 +7,12 @@ export const config = convict({
     default: 'development',
     env: 'NODE_ENV'
   },
+  log_level: {
+    doc: 'Logging level',
+    format: ['error', 'warn', 'info', 'debug'],
+    env: 'LOG_LEVEL',
+    default: 'info',
+  },
   mongodb: {
     url: {
       doc: 'Address for MongoDB connection. Contains the username and password.',
@@ -14,6 +20,12 @@ export const config = convict({
       default: undefined,
       env: 'MONGODB_URL',
     },
+    dbName: {
+      doc: 'The name of the db to use. This should match the DB name specified in the URL above.',
+      format: '*',
+      default: 'challenge',
+      env: 'MONGODB_DB_NAME',
+    }
   },
   port: {
     doc: 'The port to bind.',
@@ -32,12 +44,6 @@ export const config = convict({
     format: '*',
     default: undefined,
     env: 'SECRET',
-  },
-  storage_type: {
-    doc: 'The type of storage to use.',
-    // TODO: Add persistent type, like DynamoDB.
-    format: ['file', 'mongodb'],
-    default: 'file',
   },
   strava: {
     access_token: {

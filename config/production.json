@@ -1,6 +1,5 @@
 {
   "root_url": "http://challenge.jeremymoseley.net",
-  "storage_type": "mongodb",
   "strava": {
     "client_id": "22336"
   }

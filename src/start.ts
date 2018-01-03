@@ -6,12 +6,15 @@ import * as express from 'express';
 import * as Router from 'express-promise-router';
 import * as expressSession from 'express-session';
 import * as passport from 'passport';
+import * as morgan from 'morgan';
 import { Server } from 'net';
 
 import * as pugHandler from './handlers/pug_handler';
+import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
 import { getLogger, middleware as loggerMiddleware } from './logger';
 import { getSessionStore } from './lib/session_store';
+import { middleware as dbMiddleware } from './lib/db';
 
 const LOG = getLogger('main');
 
@@ -53,6 +56,7 @@ passport.use(new StravaStrategy({
 export async function main() {
   LOG.info('Starting server...');
   const app: express.Application = express();
+  app.use(morgan('tiny'));
   app.use(loggerMiddleware());
   app.set('view engine', 'pug');
   app.use(express.static('./public'));
@@ -66,6 +70,7 @@ export async function main() {
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(await dbMiddleware());
 
   const router = Router();
   router.get('/', pugHandler.index);
@@ -73,11 +78,10 @@ export async function main() {
   app.get(
     '/auth/strava/callback',
     passport.authenticate('strava', { failureRedirect: '/' }),
-    (req, res) => {
-      // Successful authentication, redirect home.
-      res.redirect('/');
-    },
+    authHandler.callback,
   );
+  // TODO: Should we clear the users access token?
+  app.get('/logout', authHandler.logout);
 
   app.use(router);
 
@@ -95,5 +99,8 @@ export async function main() {
 }
 
 if (config.get('env') !== 'test') {
-  main();
+  main().catch(error => {
+    console.log(error);
+    LOG.error(`Failed to start server.`, { error });
+  });
 }

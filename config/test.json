@@ -1,4 +1,7 @@
 {
+  "mongodb": {
+    "url": "mongodb://localhost:27017/challenge"
+  },
   "port": "8766",
   "secret": "This is not a secret",
   "strava": {

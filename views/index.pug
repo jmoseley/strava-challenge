@@ -22,6 +22,7 @@ html
     h1 Challenge
     if user
       h2 Welcome #{user.displayName}!
+      a(href='/logout?returnTo=/') Logout
     else
       a(href=`/auth/strava`)
         img(src="/imgs/btn_strava_connectwith_orange@2x.png", alt="Connect With Strava")
