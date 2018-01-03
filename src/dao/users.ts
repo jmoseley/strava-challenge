@@ -39,6 +39,17 @@ export default class UserDAO extends WithLog {
     return user;
   }
 
+  public async updateAccessToken(id: string, accessToken: string): Promise<User> {
+    const result = await this.collection().findOneAndUpdate({ id }, {
+      $set: { accessToken },
+    });
+
+    if (!result.value) {
+      throw new Error(`Cannot update user that does not exist.`);
+    }
+    return result.value;
+  }
+
   private collection() {
     return this.db.collection(this.collectionName);
   }

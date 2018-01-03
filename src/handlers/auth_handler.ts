@@ -15,6 +15,8 @@ export async function callback(req: any, res: any, next: any) {
     let user = await userDao.findUser(userFromSession.provider, userFromSession.id);
     if (user) {
       log.info(`Found existing user for oauth`, { user });
+      user = await userDao.updateAccessToken(user.id, userFromSession.token);
+      log.debug(`Finished updating user access token`);
     } else {
       // Successful authentication, save the user, redirect home.
       const createOptions = {
@@ -23,7 +25,7 @@ export async function callback(req: any, res: any, next: any) {
         provider: userFromSession.provider,
         providerId: userFromSession.id,
       };
-      log.info(`Creating user for oauth`, { user: createOptions });
+      log.info(`Creating user for oauth`, { user: _.omit(createOptions, ['accessToken']) });
       user = await userDao.create(createOptions);
     }
     req.session.user = user;
