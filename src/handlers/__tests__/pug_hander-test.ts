@@ -20,7 +20,7 @@ describe(`PugHandler`, () => {
       let user: any;
       beforeEach(() => {
         user = { displayName: 'Joe Shmoe' };
-        _.set(req, 'session.passport.user', user);
+        _.set(req, 'session.user', user);
       });
 
       it(`renders with the users displayName`, async () => {
