@@ -18,7 +18,7 @@ describe(`AuthHandler`, () => {
         daos: {
           // Can we use mocks?
           user: {
-            findUser: jest.fn(),
+            findUsers: jest.fn(),
             updateAccessToken: jest.fn(),
             create: jest.fn(),
           },
@@ -74,7 +74,7 @@ describe(`AuthHandler`, () => {
 
       describe(`without an existing user`, () => {
         beforeEach(async () => {
-          req.context.daos.user.findUser.mockReturnValue(null);
+          req.context.daos.user.findUsers.mockReturnValue([]);
           req.context.daos.user.create.mockReturnValue(user);
 
           await authHandler.callback(req, res, next);
@@ -91,10 +91,12 @@ describe(`AuthHandler`, () => {
         });
 
         it(`tries to find the user`, () => {
-          expect(req.context.daos.user.findUser).toBeCalledWith(
-            'strava',
-            'stravaid',
-          );
+          expect(req.context.daos.user.findUsers).toBeCalledWith([
+            {
+              provider: 'strava',
+              providerId: 'stravaid',
+            },
+          ]);
         });
 
         it(`redirects the user`, () => {
@@ -104,7 +106,7 @@ describe(`AuthHandler`, () => {
 
       describe(`with an existing user`, () => {
         beforeEach(async () => {
-          req.context.daos.user.findUser.mockReturnValue(user);
+          req.context.daos.user.findUsers.mockReturnValue([user]);
           req.context.daos.user.updateAccessToken.mockReturnValue(user);
 
           await authHandler.callback(req, res, next);
@@ -126,10 +128,12 @@ describe(`AuthHandler`, () => {
         });
 
         it(`tries to find the user`, () => {
-          expect(req.context.daos.user.findUser).toBeCalledWith(
-            'strava',
-            'stravaid',
-          );
+          expect(req.context.daos.user.findUsers).toBeCalledWith([
+            {
+              provider: 'strava',
+              providerId: 'stravaid',
+            },
+          ]);
         });
 
         it(`redirects the user`, () => {

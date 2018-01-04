@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as MongoDB from 'mongodb';
 
-import { config } from '../config';
-import { getLogger } from '../logger';
-import UserDAO from '../dao/users';
+import { config } from '../../config';
+import { getLogger } from '../../logger';
+import UserMongoDAO from './users';
 
 const LOG = getLogger('lib/db');
 
-export async function middleware(): Promise<express.RequestHandler> {
+export default async function middleware(): Promise<express.RequestHandler> {
   LOG.debug(`Connecting to database`);
   const mongodbConfig = config.get('mongodb');
   const dbClient = await MongoDB.MongoClient.connect(mongodbConfig.url);
@@ -21,7 +21,7 @@ export async function middleware(): Promise<express.RequestHandler> {
     }
 
     req.context.daos = {
-      user: new UserDAO(req.context.loggerFactory, db),
+      user: new UserMongoDAO(req.context.loggerFactory, db),
     };
 
     next();

@@ -1,0 +1,15 @@
+extends layout.pug
+
+block content
+  h2 Friends
+  if potentialFriends.length
+    h3 Add Friends
+
+  if needInviteFriends.length
+    h3 Invite a Friend
+    each val in needInviteFriends
+      p
+        img(src=val.avatarUrl width=100)
+        br
+        | #{val.displayName}
+

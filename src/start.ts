@@ -14,7 +14,7 @@ import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
 import { getLogger, middleware as loggerMiddleware } from './logger';
 import { getSessionStore } from './lib/session_store';
-import { middleware as dbMiddleware } from './lib/db';
+import dbMiddleware from './dao/mongo/middleware';
 
 const LOG = getLogger('main');
 
@@ -79,11 +79,13 @@ export async function main() {
 
   const router = Router();
   router.get('/', pugHandler.index);
-  app.get(
+  router.get('/friends', pugHandler.friends);
+
+  router.get(
     '/auth/strava',
     passport.authenticate('strava', { scope: 'view_private' }),
   );
-  app.get(
+  router.get(
     '/auth/strava/callback',
     passport.authenticate('strava', { failureRedirect: '/' }),
     authHandler.callback,
