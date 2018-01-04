@@ -14,7 +14,7 @@ import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
 import { getLogger, middleware as loggerMiddleware } from './logger';
 import { getSessionStore } from './lib/session_store';
-import { middleware as dbMiddleware } from './lib/db';
+import dbMiddleware from './dao/mongo/middleware';
 
 const LOG = getLogger('main');
 

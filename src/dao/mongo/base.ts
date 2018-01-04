@@ -1,7 +1,7 @@
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory, WithLog } from '../logger';
+import { LoggerFactory, WithLog } from '../../logger';
 
 export interface BaseModel {
   id: string;
@@ -9,7 +9,7 @@ export interface BaseModel {
   updatedAt: string;
 }
 
-export default class BaseDAO<
+export default class BaseMongoDAO<
   Model extends BaseModel,
   CreateOptions extends Partial<Model>
 > extends WithLog {

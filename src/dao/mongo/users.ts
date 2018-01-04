@@ -1,7 +1,7 @@
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../../logger';
 import BaseDAO, { BaseModel } from './base';
 
 export interface User extends UserCreateOptions, BaseModel {}
@@ -13,7 +13,7 @@ export interface UserCreateOptions {
   providerId: string;
 }
 
-export default class UserDAO extends BaseDAO<User, UserCreateOptions> {
+export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   protected readonly collectionName: string = 'users';
 
   // DAOs should be bound to a request, this logger factory should come from the request.

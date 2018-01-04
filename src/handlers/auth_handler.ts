@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 
-import UserDAO from '../dao/users';
+import UserMongoDAO from '../dao/mongo/users';
 
 // Once this handler gets too big, let's break it out into actions.
 export async function callback(req: any, res: any, next: express.NextFunction) {
