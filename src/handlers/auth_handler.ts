@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
+import * as express from 'express';
 
 import UserDAO from "../dao/users";
 
 // Once this handler gets too big, let's break it out into actions.
-export async function callback(req: any, res: any, next: any) {
+export async function callback(req: any, res: any, next: express.NextFunction) {
   const log = req.context.loggerFactory.getLogger('AuthHandler.callback');
   log.info(`Callback from oauth`);
 
@@ -35,7 +36,7 @@ export async function callback(req: any, res: any, next: any) {
   }
 }
 
-export function logout(req: any, res: any) {
+export function logout(req: any, res: any, next: express.NextFunction) {
   req.logout();
   req.session.destroy(() => {
     res.redirect('/'); //Inside a callback… bulletproof!
