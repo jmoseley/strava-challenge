@@ -1,37 +1,34 @@
 {
   "name": "strava-challenge",
   "version": "1.0.0",
-  "description": "Allow users to create private challenges and share them with their friends.",
+  "description":
+    "Allow users to create private challenges and share them with their friends.",
   "main": "dist/start.js",
   "scripts": {
     "dev": "./scripts/dev.sh",
     "clean": "./scripts/clean.sh",
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
-    "compile": "./scripts/compile.sh"
+    "compile": "./scripts/compile.sh",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,json,css,md,ts}": [
+      "prettier --single-quote --trailing-comma all --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jmoseley/strava-challenge.git"
   },
-  "keywords": [
-    "strava",
-    "training",
-    "exercise"
-  ],
+  "keywords": ["strava", "training", "exercise"],
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "src/(.*/)*(__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
   },
   "author": "Jeremy Moseley",
   "license": "MIT",
@@ -76,7 +73,10 @@
   "devDependencies": {
     "@types/jest": "^22.0.0",
     "forever": "^0.15.3",
+    "husky": "^0.14.3",
     "jest": "^22.0.4",
+    "lint-staged": "^6.0.0",
+    "prettier": "^1.9.2",
     "ts-jest": "^22.0.0"
   }
 }

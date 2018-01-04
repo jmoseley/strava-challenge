@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 
-import UserDAO from "../dao/users";
+import UserDAO from '../dao/users';
 
 // Once this handler gets too big, let's break it out into actions.
 export async function callback(req: any, res: any, next: express.NextFunction) {
@@ -11,10 +11,16 @@ export async function callback(req: any, res: any, next: express.NextFunction) {
   const userFromSession = _.get(req.session, 'passport.user');
   if (userFromSession) {
     // Try to lookup the user first.
-    let user = await req.context.daos.user.findUser(userFromSession.provider, userFromSession.id);
+    let user = await req.context.daos.user.findUser(
+      userFromSession.provider,
+      userFromSession.id,
+    );
     if (user) {
       log.info(`Found existing user for oauth`, { user });
-      user = await req.context.daos.user.updateAccessToken(user.id, userFromSession.token);
+      user = await req.context.daos.user.updateAccessToken(
+        user.id,
+        userFromSession.token,
+      );
       log.debug(`Finished updating user access token`);
     } else {
       // Successful authentication, save the user, redirect home.
@@ -24,7 +30,9 @@ export async function callback(req: any, res: any, next: express.NextFunction) {
         provider: userFromSession.provider,
         providerId: userFromSession.id,
       };
-      log.info(`Creating user for oauth`, { user: _.omit(createOptions, ['accessToken']) });
+      log.info(`Creating user for oauth`, {
+        user: _.omit(createOptions, ['accessToken']),
+      });
       user = await req.context.daos.user.create(createOptions);
     }
     req.session.user = user;

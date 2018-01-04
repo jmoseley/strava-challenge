@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import * as pugHandler from '../pug_handler';
-import { LoggerFactory } from "../../logger";
+import { LoggerFactory } from '../../logger';
 
 describe(`PugHandler`, () => {
   describe(`index`, () => {

@@ -1,10 +1,10 @@
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory, WithLog } from "../logger";
+import { LoggerFactory, WithLog } from '../logger';
 
 export interface User extends UserCreateOptions {
-  id:string;
+  id: string;
 }
 
 export interface UserCreateOptions {
@@ -22,11 +22,14 @@ export default class UserDAO extends WithLog {
     super(loggerFactory);
   }
 
-  public async findUser(provider: string, providerId: string): Promise<User|null> {
+  public async findUser(
+    provider: string,
+    providerId: string,
+  ): Promise<User | null> {
     return await this.collection().findOne({ provider, providerId });
   }
 
-  public async create(userCreateOptions:UserCreateOptions): Promise<User> {
+  public async create(userCreateOptions: UserCreateOptions): Promise<User> {
     const user = {
       id: uuid.v4(),
       ...userCreateOptions,
@@ -39,10 +42,16 @@ export default class UserDAO extends WithLog {
     return user;
   }
 
-  public async updateAccessToken(id: string, accessToken: string): Promise<User> {
-    const result = await this.collection().findOneAndUpdate({ id }, {
-      $set: { accessToken },
-    });
+  public async updateAccessToken(
+    id: string,
+    accessToken: string,
+  ): Promise<User> {
+    const result = await this.collection().findOneAndUpdate(
+      { id },
+      {
+        $set: { accessToken },
+      },
+    );
 
     if (!result.value) {
       throw new Error(`Cannot update user that does not exist.`);
