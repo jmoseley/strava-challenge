@@ -1,11 +1,10 @@
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory, WithLog } from '../logger';
+import { LoggerFactory } from '../logger';
+import BaseDAO, { BaseModel } from './base';
 
-export interface User extends UserCreateOptions {
-  id: string;
-}
+export interface User extends UserCreateOptions, BaseModel {}
 
 export interface UserCreateOptions {
   displayName: string;
@@ -14,12 +13,12 @@ export interface UserCreateOptions {
   providerId: string;
 }
 
-export default class UserDAO extends WithLog {
-  private readonly collectionName: string = 'users';
+export default class UserDAO extends BaseDAO<User, UserCreateOptions> {
+  protected readonly collectionName: string = 'users';
 
   // DAOs should be bound to a request, this logger factory should come from the request.
-  constructor(loggerFactory: LoggerFactory, private readonly db: MongoDB.Db) {
-    super(loggerFactory);
+  constructor(loggerFactory: LoggerFactory, db: MongoDB.Db) {
+    super(loggerFactory, db);
   }
 
   public async findUser(
@@ -27,19 +26,6 @@ export default class UserDAO extends WithLog {
     providerId: string,
   ): Promise<User | null> {
     return await this.collection().findOne({ provider, providerId });
-  }
-
-  public async create(userCreateOptions: UserCreateOptions): Promise<User> {
-    const user = {
-      id: uuid.v4(),
-      ...userCreateOptions,
-    };
-    this.log.info(`Creating user`, { user });
-
-    const result = await this.collection().insertOne(user);
-    this.log.debug(`Got result from create`, { result });
-
-    return user;
   }
 
   public async updateAccessToken(
@@ -57,9 +43,5 @@ export default class UserDAO extends WithLog {
       throw new Error(`Cannot update user that does not exist.`);
     }
     return result.value;
-  }
-
-  private collection() {
-    return this.db.collection(this.collectionName);
   }
 }
