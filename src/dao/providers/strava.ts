@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as URL from 'url-parse';
 import * as util from 'util';
 
 import BaseMongoDAO from '../mongo/base';
@@ -29,11 +30,18 @@ export default class StravaProviderDAO extends WithLog
   }
 
   private convertUser(rawUser: RawStravaUser): StravaUser {
+    // Handles default profile images that look like 'avatar/athlete/large.png' or 'avatar/athlete/medium.png'
+    if (rawUser.profile) {
+      const profileUrl = URL(rawUser.profile);
+      if (!profileUrl.hostname) {
+        rawUser.profile = undefined as any;
+      }
+    }
+
     return {
       providerId: rawUser.id.toString(),
       provider: 'strava',
-      displayName:
-        rawUser.username || `${rawUser.firstname} ${rawUser.lastname}`,
+      displayName: `${rawUser.firstname} ${rawUser.lastname}`,
       avatarUrl: rawUser.profile,
     };
   }

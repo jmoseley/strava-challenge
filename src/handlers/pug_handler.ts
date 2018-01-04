@@ -22,6 +22,12 @@ export async function index(req: any, res: express.Response) {
   res.render('index', context);
 }
 
+// Data layout for friends:
+// Friend Request:
+// sourceUseId, targetUserId
+// When request is accepted, we create a friendship, and delete the request
+// Frienship:
+// user1Id, user2Id
 export async function friends(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger(`PugHander.friends`);
   const context = getSharedTemplateContext(req, log);
@@ -38,7 +44,7 @@ export async function friends(req: any, res: express.Response) {
   const stravaFriends = await stravaProvider.getFriends();
 
   // Parition by friends that are already in the database.
-  // Potential friends are friends that are already on the platform.
+  // Potential friends are friends that are already on the plgatform.
   // Non-potential friends are friends that aren't on the platform yet, and need to be invited.
   // TODO: Eventually we should just create a user object for all these users that we find.
 
@@ -58,6 +64,9 @@ export async function friends(req: any, res: express.Response) {
       );
     },
   );
+
+  // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
+  // friendship automatically.
 
   // TODO: Filter out people that are already friends.
   context.potentialFriends = potentialFriends;
