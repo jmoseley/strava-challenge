@@ -9,13 +9,11 @@ export async function callback(req: any, res: any, next: any) {
 
   const userFromSession = _.get(req.session, 'passport.user');
   if (userFromSession) {
-    const userDao = new UserDAO(req.context.loggerFactory, req.context.db);
-
     // Try to lookup the user first.
-    let user = await userDao.findUser(userFromSession.provider, userFromSession.id);
+    let user = await req.context.daos.user.findUser(userFromSession.provider, userFromSession.id);
     if (user) {
       log.info(`Found existing user for oauth`, { user });
-      user = await userDao.updateAccessToken(user.id, userFromSession.token);
+      user = await req.context.daos.user.updateAccessToken(user.id, userFromSession.token);
       log.debug(`Finished updating user access token`);
     } else {
       // Successful authentication, save the user, redirect home.
@@ -26,7 +24,7 @@ export async function callback(req: any, res: any, next: any) {
         providerId: userFromSession.id,
       };
       log.info(`Creating user for oauth`, { user: _.omit(createOptions, ['accessToken']) });
-      user = await userDao.create(createOptions);
+      user = await req.context.daos.user.create(createOptions);
     }
     req.session.user = user;
 
