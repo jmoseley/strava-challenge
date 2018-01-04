@@ -21,9 +21,13 @@ html
   body
     h1 Challenge
     if user
-      h2 Welcome #{user.displayName}!
-      a(href='/logout?returnTo=/') Logout
-    else
-      block content
+      p Hello #{user.displayName}!
+      p
+        a(href='/') Home
+      p
+        a(href='/friends') Friends
+      p
+        a(href='/logout?returnTo=/') Logout
+    block content
 
 

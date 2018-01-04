@@ -79,11 +79,13 @@ export async function main() {
 
   const router = Router();
   router.get('/', pugHandler.index);
-  app.get(
+  router.get('/friends', pugHandler.friends);
+
+  router.get(
     '/auth/strava',
     passport.authenticate('strava', { scope: 'view_private' }),
   );
-  app.get(
+  router.get(
     '/auth/strava/callback',
     passport.authenticate('strava', { failureRedirect: '/' }),
     authHandler.callback,

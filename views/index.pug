@@ -1,5 +1,6 @@
 extends layout.pug
 
 block content
-  a(href=`/auth/strava`)
-    img(src="/imgs/btn_strava_connectwith_orange@2x.png", alt="Connect With Strava")
+  if !user
+    a(href=`/auth/strava`)
+      img(src="/imgs/btn_strava_connectwith_orange@2x.png", alt="Connect With Strava")
