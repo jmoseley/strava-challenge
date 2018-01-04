@@ -23,6 +23,8 @@ export default class BaseMongoDAO<
   public async create(createOptions: CreateOptions): Promise<Model> {
     const model: Model = {
       id: uuid.v4(),
+      createAt: new Date(),
+      updatedAt: new Date(),
       ...(createOptions as any), // Pending https://github.com/Microsoft/TypeScript/pull/13288
     };
     this.log.info(`Creating model`, { model });

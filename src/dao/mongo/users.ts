@@ -54,7 +54,7 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
     const result = await this.collection().findOneAndUpdate(
       { id },
       {
-        $set: { accessToken },
+        $set: { accessToken, updatedAt: new Date() },
       },
     );
 
