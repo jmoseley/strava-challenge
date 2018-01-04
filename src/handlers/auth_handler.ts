@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 
-import UserMongoDAO from '../dao/mongo/users';
+import UserMongoDAO, { User } from '../dao/mongo/users';
 
 // Once this handler gets too big, let's break it out into actions.
 export async function callback(req: any, res: any, next: express.NextFunction) {
@@ -11,11 +11,16 @@ export async function callback(req: any, res: any, next: express.NextFunction) {
   const userFromSession = _.get(req.session, 'passport.user');
   if (userFromSession) {
     // Try to lookup the user first.
-    let user = await req.context.daos.user.findUser(
-      userFromSession.provider,
-      userFromSession.id,
-    );
-    if (user) {
+    let users: User[] = await req.context.daos.user.findUsers([
+      {
+        provider: userFromSession.provider,
+        providerId: userFromSession.id,
+      },
+    ]);
+    let user: User;
+    if (users.length) {
+      user = _.head(users) as User;
+
       log.info(`Found existing user for oauth`, { user });
       user = await req.context.daos.user.updateAccessToken(
         user.id,

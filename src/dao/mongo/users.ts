@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
@@ -21,11 +22,29 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
     super(loggerFactory, db);
   }
 
-  public async findUser(
-    provider: string,
-    providerId: string,
-  ): Promise<User | null> {
-    return await this.collection().findOne({ provider, providerId });
+  public async findUsers(
+    userIdentifiers: {
+      provider: string;
+      providerId: string;
+    }[],
+  ): Promise<User[]> {
+    const result = await this.collection().find(
+      _.reduce(
+        userIdentifiers,
+        (query, uid) => {
+          query.provider.$in.push(uid.provider);
+          query.providerId.$in.push(uid.providerId);
+
+          return query;
+        },
+        {
+          provider: { $in: [] as string[] },
+          providerId: { $in: [] as string[] },
+        },
+      ),
+    );
+
+    return await result.toArray();
   }
 
   public async updateAccessToken(

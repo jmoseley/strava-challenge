@@ -27,9 +27,7 @@ export default class BaseMongoDAO<
     };
     this.log.info(`Creating model`, { model });
 
-    const result = await this.collection().insertOne(model);
-    this.log.debug(`Got result from create`, { result });
-
+    await this.collection().insertOne(model);
     return model;
   }
 
