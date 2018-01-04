@@ -3,6 +3,7 @@ import * as MongoDB from 'mongodb';
 
 import { config } from '../config';
 import { getLogger } from '../logger';
+import UserDAO from '../dao/users';
 
 const LOG = getLogger('lib/db');
 
@@ -15,10 +16,13 @@ export async function middleware(): Promise<express.RequestHandler> {
 
   // TODO: Need to get some typing for this request object.
   return (req: any, res: any, next: express.NextFunction) => {
-    if (!req.context) {
-      req.context = {};
+    if (!req.context || !req.context.loggerFactory) {
+      throw new Error(`DB middleware must be called after logging middleware.`);
     }
-    req.context.db = db;
+
+    req.context.daos = {
+      user: new UserDAO(req.context.loggerFactory, db),
+    };
 
     next();
   }

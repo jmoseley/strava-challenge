@@ -47,7 +47,7 @@ passport.use(new StravaStrategy({
     callbackURL: `${config.get('root_url')}/auth/strava/callback`,
   },
   (accessToken: any, refreshToken: any, profile: any, done: Function) => {
-    LOG.info(`Resolve StravaStrategy`, { accessToken, refreshToken, profile });
+    LOG.info(`Resolve StravaStrategy`);
     return done(null, profile);
   }
 ));
