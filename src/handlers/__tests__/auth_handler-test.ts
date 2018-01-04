@@ -81,7 +81,9 @@ describe(`AuthHandler`, () => {
         });
 
         it(`creates the user`, async () => {
-          expect(req.context.daos.user.create).toBeCalledWith(_.omit(user, ['id']));
+          expect(req.context.daos.user.create).toBeCalledWith(
+            _.omit(user, ['id']),
+          );
         });
 
         it(`sets the user in the session`, () => {
@@ -89,7 +91,10 @@ describe(`AuthHandler`, () => {
         });
 
         it(`tries to find the user`, () => {
-          expect(req.context.daos.user.findUser).toBeCalledWith('strava', 'stravaid');
+          expect(req.context.daos.user.findUser).toBeCalledWith(
+            'strava',
+            'stravaid',
+          );
         });
 
         it(`redirects the user`, () => {
@@ -106,7 +111,10 @@ describe(`AuthHandler`, () => {
         });
 
         it(`updates the accessToken`, () => {
-          expect(req.context.daos.user.updateAccessToken).toBeCalledWith(user.id, '123456');
+          expect(req.context.daos.user.updateAccessToken).toBeCalledWith(
+            user.id,
+            '123456',
+          );
         });
 
         it(`sets the user in the session`, () => {
@@ -118,7 +126,10 @@ describe(`AuthHandler`, () => {
         });
 
         it(`tries to find the user`, () => {
-          expect(req.context.daos.user.findUser).toBeCalledWith('strava', 'stravaid');
+          expect(req.context.daos.user.findUser).toBeCalledWith(
+            'strava',
+            'stravaid',
+          );
         });
 
         it(`redirects the user`, () => {

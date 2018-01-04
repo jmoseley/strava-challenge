@@ -13,7 +13,10 @@
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{js,json,css,md,ts}": ["prettier --write", "git add"]
+    "*.{js,json,css,md,ts}": [
+      "prettier --single-quote --trailing-comma all --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",

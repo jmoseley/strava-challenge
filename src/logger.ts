@@ -17,7 +17,7 @@ function createTransports(loggerName?: string): winston.TransportInstance[] {
     new winston.transports.Console({
       label: loggerName,
       level: config.get('log_level'),
-     }),
+    }),
   ];
   // TODO: Sentry
   return transports;
@@ -44,8 +44,12 @@ export class LoggerFactory {
 }
 
 export class LoggerInstance {
-  constructor(private readonly name: string, private readonly base: string, private readonly winstonLogger: winston.LoggerInstance) {}
-  
+  constructor(
+    private readonly name: string,
+    private readonly base: string,
+    private readonly winstonLogger: winston.LoggerInstance,
+  ) {}
+
   public info(message: string, context?: object) {
     this.winstonLogger.info(message, this.buildContext(context));
   }
@@ -56,11 +60,11 @@ export class LoggerInstance {
     this.winstonLogger.debug(message, this.buildContext(context));
   }
   public error(message: string, context?: object) {
-    this.winstonLogger.error(message, this.buildContext(context))
+    this.winstonLogger.error(message, this.buildContext(context));
   }
 
   private buildContext(context: object = {}): any {
-    return { ...context, 'scope': this.base, 'target': this.name };
+    return { ...context, scope: this.base, target: this.name };
   }
 }
 
@@ -84,5 +88,5 @@ export function middleware(): express.RequestHandler {
     req.context.loggerFactory = new LoggerFactory(req.context.traceId);
 
     next();
-  }
+  };
 }

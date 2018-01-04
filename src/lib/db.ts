@@ -25,5 +25,5 @@ export async function middleware(): Promise<express.RequestHandler> {
     };
 
     next();
-  }
+  };
 }

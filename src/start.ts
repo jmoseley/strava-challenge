@@ -41,16 +41,19 @@ const stravaConfig = config.get('strava');
 //   Strategies in Passport require a `verify` function, which accept
 //   credentials (in this case, an accessToken, refreshToken, and Strava
 //   profile), and invoke a callback with a user object.
-passport.use(new StravaStrategy({
-    clientID: stravaConfig.client_id,
-    clientSecret: stravaConfig.client_secret,
-    callbackURL: `${config.get('root_url')}/auth/strava/callback`,
-  },
-  (accessToken: any, refreshToken: any, profile: any, done: Function) => {
-    LOG.info(`Resolve StravaStrategy`);
-    return done(null, profile);
-  }
-));
+passport.use(
+  new StravaStrategy(
+    {
+      clientID: stravaConfig.client_id,
+      clientSecret: stravaConfig.client_secret,
+      callbackURL: `${config.get('root_url')}/auth/strava/callback`,
+    },
+    (accessToken: any, refreshToken: any, profile: any, done: Function) => {
+      LOG.info(`Resolve StravaStrategy`);
+      return done(null, profile);
+    },
+  ),
+);
 
 // Exported just for tests.
 export async function main() {
@@ -62,19 +65,24 @@ export async function main() {
   app.use(express.static('./public'));
   app.set('views', './views');
   app.use(cookieParser(config.get('secret')));
-  app.use(expressSession({
-    store: getSessionStore(),
-    secret: config.get('secret'),
-    saveUninitialized: false,
-    resave: false,
-  }));
+  app.use(
+    expressSession({
+      store: getSessionStore(),
+      secret: config.get('secret'),
+      saveUninitialized: false,
+      resave: false,
+    }),
+  );
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(await dbMiddleware());
 
   const router = Router();
   router.get('/', pugHandler.index);
-  app.get('/auth/strava', passport.authenticate('strava', { scope: 'view_private' }));
+  app.get(
+    '/auth/strava',
+    passport.authenticate('strava', { scope: 'view_private' }),
+  );
   app.get(
     '/auth/strava/callback',
     passport.authenticate('strava', { failureRedirect: '/' }),
