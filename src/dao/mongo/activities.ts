@@ -26,18 +26,13 @@ export default class ActivityMongoDAO extends BaseDAO<
 > {
   protected readonly collectionName: string = 'activities';
 
-  // DAOs should be bound to a request, this logger factory should come from the request.
-  constructor(loggerFactory: LoggerFactory, db: MongoDB.Db) {
-    super(loggerFactory, db);
-  }
-
   public async findActivitiesByUser(userId: string): Promise<Activity[]> {
     const queryResult = await this.collection().find({
       userId,
     });
 
     let result = await queryResult.toArray();
-    this.log.debug(`found ${result.length} activities for user ${userId}...`);
+    this.log.debug(`Found ${result.length} activities for user ${userId}.`);
     return result;
   }
 }

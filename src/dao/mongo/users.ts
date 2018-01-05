@@ -18,11 +18,6 @@ export interface UserCreateOptions {
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   protected readonly collectionName: string = 'users';
 
-  // DAOs should be bound to a request, this logger factory should come from the request.
-  constructor(loggerFactory: LoggerFactory, db: MongoDB.Db) {
-    super(loggerFactory, db);
-  }
-
   public async findUsers(
     userIdentifiers: {
       provider: string;

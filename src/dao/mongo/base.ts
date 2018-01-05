@@ -1,5 +1,6 @@
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
+import _ = require('lodash');
 
 import { LoggerFactory, WithLog } from '../../logger';
 
@@ -24,14 +25,31 @@ export default class BaseMongoDAO<
     return await this.collection().findOne({ id });
   }
 
+  public async createMultiple(
+    createOptionsList: CreateOptions[],
+  ): Promise<Model[]> {
+    const models = _.map(createOptionsList, this.getModel);
+    this.log.debug(`Creating models`, models);
+
+    const result = await this.collection().insertMany(models);
+    this.log.debug(
+      `Successfully inserted ${result.insertedCount} of ${
+        models.length
+      } models.`,
+    );
+
+    if (result.insertedCount != models.length) {
+      console.error(
+        `Could not insert ${models.length - result.insertedCount} models.`,
+        result,
+      );
+    }
+
+    return models;
+  }
+
   public async create(createOptions: CreateOptions): Promise<Model> {
-    const model: Model = {
-      // TODO: mongo automatically generates an id that is indexed. Maybe we should use that instead?
-      id: uuid.v4(),
-      createAt: new Date(),
-      updatedAt: new Date(),
-      ...(createOptions as any), // Pending https://github.com/Microsoft/TypeScript/pull/13288
-    };
+    const model = this.getModel(createOptions);
     this.log.info(`Creating model`, { model });
 
     await this.collection().insertOne(model);
@@ -40,5 +58,15 @@ export default class BaseMongoDAO<
 
   protected collection() {
     return this.db.collection(this.collectionName);
+  }
+
+  private getModel(createOptions: CreateOptions): Model {
+    return {
+      // TODO: mongo automatically generates an id that is indexed. Maybe we should use that instead?
+      id: uuid.v4(),
+      createAt: new Date(),
+      updatedAt: new Date(),
+      ...(createOptions as any), // Pending https://github.com/Microsoft/TypeScript/pull/13288
+    };
   }
 }

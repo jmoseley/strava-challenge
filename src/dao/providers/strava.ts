@@ -35,9 +35,9 @@ export default class StravaProviderDAO extends WithLog
     });
 
     this.log.debug(
-      `found ${rawActivities.length} new activities from strava for user ${
+      `Found ${rawActivities.length} new activities from strava for user ${
         this.userId
-      }...`,
+      }.`,
     );
 
     return _.map(rawActivities, activity => {
@@ -81,7 +81,7 @@ export default class StravaProviderDAO extends WithLog
       distance: rawActivity.distance,
       elevation: rawActivity.total_elevation_gain,
       provider: 'strava',
-      providerId: '' + rawActivity.id,
+      providerId: rawActivity.id.toString(),
     };
   }
 }

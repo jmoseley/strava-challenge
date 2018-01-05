@@ -104,19 +104,10 @@ async function syncStravaActivities(
 
   // get all activities from strava after the time activities were last synced.
   const stravaActivities = await stravaProvider.getActivities(nextActivityDate);
-  _.map(stravaActivities, stravaActivity => {
-    stravaActivity.userId = req.session.user.id;
-    return stravaActivity;
-  });
 
   let newLastSyncedAt = new Date();
 
-  // persist the activities
-  await Promise.all(
-    _.map(stravaActivities, activity => {
-      return req.context.daos.activity.create(activity);
-    }),
-  );
+  req.context.daos.activity.createMultiple(stravaActivities);
 
   // set the lastActivitiesSyncedAt to now.
   // TODO: We might want to set this to the date of the last activity, just in case a ride hasn't been uploaded to
