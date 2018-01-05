@@ -35,7 +35,7 @@ export default class StravaProviderDAO extends WithLog
     });
 
     this.log.debug(
-      `found ${rawActivities.length} activities from strava for user ${
+      `found ${rawActivities.length} new activities from strava for user ${
         this.userId
       }...`,
     );
