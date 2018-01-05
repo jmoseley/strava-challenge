@@ -4,9 +4,7 @@ import * as util from 'util';
 
 import { BaseProviderDAO, ProviderActivity, ProviderUser } from './base';
 import { WithLog, LoggerFactory } from '../../logger';
-import { Activity } from '../mongo/activities';
-import { isNull, isNullOrUndefined } from 'util';
-import { activities } from '../../handlers/pug_handler';
+import { isNullOrUndefined } from 'util';
 
 // OMG types....
 const strava = require('strava-v3');
@@ -30,12 +28,17 @@ export default class StravaProviderDAO extends WithLog
       ? afterDate.getTime() / 1000
       : null;
 
+    // TODO: Deal with pagination
     const rawActivities: RawStravaActivity[] = await listActivities({
       access_token: this.accessToken,
       after: afterSeconds,
     });
 
-    console.log(rawActivities);
+    this.log.debug(
+      `found ${rawActivities.length} activities from strava for user ${
+        this.userId
+      }...`,
+    );
 
     return _.map(rawActivities, activity => {
       return this.convertActivity(activity);

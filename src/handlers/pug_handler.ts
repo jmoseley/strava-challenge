@@ -76,19 +76,33 @@ export async function activities(req: any, res: express.Response) {
     return;
   }
 
+  await syncStravaActivities(req, res, log);
+
+  context.activities = await req.context.daos.activity.findActivitiesByUser(
+    req.session.user.id,
+  );
+
+  res.render('activities', context);
+}
+async function syncStravaActivities(
+  req: any,
+  res: express.Response,
+  log: LoggerInstance,
+) {
   const stravaProvider = new StravaProviderDAO(
     req.session.user.id,
     req.session.user.accessToken,
     req.context.loggerFactory,
   );
 
-  // get the last time activities were synced for the user
+  // get the last time activities were synced for the user. if activites have never been synced, get the activities for
+  // the past two weeks.
   let user = await req.context.daos.user.findById(req.session.user.id);
   const nextActivityDate = !isNullOrUndefined(user.lastActivitiesSyncedAt)
-    ? new Date(new Date(user.lastActivitiesSyncedAt).getTime() + 1000)
+    ? new Date(new Date(user.lastActivitiesSyncedAt).getTime())
     : new Date(new Date().getTime() - 1209600 * 1000); // TODO: make this configurable. Currently set to past two weeks.
 
-  // get all activities after the time activities were last synced.
+  // get all activities from strava after the time activities were last synced.
   const stravaActivities = await stravaProvider.getActivities(nextActivityDate);
   _.map(stravaActivities, stravaActivity => {
     stravaActivity.userId = req.session.user.id;
@@ -104,20 +118,16 @@ export async function activities(req: any, res: express.Response) {
     }),
   );
 
-  // set the last synced activities to the last element (which should be the most recent), or the current time.
+  // set the lastActivitiesSyncedAt to now.
+  // TODO: We might want to set this to the date of the last activity, just in case a ride hasn't been uploaded to
+  // strava yet when we perform the sync.
   await req.context.daos.user.updateLastActivitiesSyncedAt(
     req.session.user.id,
     newLastSyncedAt,
   );
-
-  context.activities = await req.context.daos.activity.findActivitiesByUser(
-    req.session.user.id,
-  );
-
-  res.render('activities', context);
 }
 
-// TODO: consider moving these into a base handler class
+// TODO: consider moving the following functions into a base handler class
 function isAuthenticated(req: any, res: express.Response, log: LoggerInstance) {
   if (!req.session.user) {
     log.debug(`No user in session, redirecting`);

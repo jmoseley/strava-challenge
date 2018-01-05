@@ -14,5 +14,5 @@ export interface BaseProviderDAO<
   Activity extends ProviderActivity
 > {
   getFriends(): Promise<User[]>;
-  getActivities(before: Date, after: Date): Promise<ActivityCreateOptions[]>;
+  getActivities(afterDate: Date): Promise<Activity[]>;
 }

@@ -32,12 +32,12 @@ export default class ActivityMongoDAO extends BaseDAO<
   }
 
   public async findActivitiesByUser(userId: string): Promise<Activity[]> {
-    const result = await this.collection().find({
+    const queryResult = await this.collection().find({
       userId: userId,
     });
 
-    let resultToReturn = await result.toArray();
-    console.log(`found ${resultToReturn.length} activities for user ${userId}`);
-    return await result.toArray();
+    let result = await queryResult.toArray();
+    this.log.debug(`found ${result.length} activities for user ${userId}...`);
+    return await result;
   }
 }
