@@ -23,7 +23,7 @@ export default async function middleware(): Promise<express.RequestHandler> {
 
     req.context.daos = {
       user: new UserMongoDAO(req.context.loggerFactory, db),
-      activities: new ActivityMongoDAO(req.context.loggerFactory, db),
+      activity: new ActivityMongoDAO(req.context.loggerFactory, db),
     };
 
     next();

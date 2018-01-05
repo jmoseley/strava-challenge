@@ -9,9 +9,9 @@ export interface Activity extends ActivityCreateOptions, BaseModel {}
 
 export interface ActivityCreateOptions {
   userId: string;
-  activityName: string;
-  activityType: string;
-  activityDate: Date;
+  name: string;
+  type: string;
+  startDate: Date;
   movingTime: number;
   totalTime: number;
   distance: number;
