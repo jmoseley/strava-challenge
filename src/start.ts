@@ -80,6 +80,7 @@ export async function main() {
   const router = Router();
   router.get('/', pugHandler.index);
   router.get('/friends', pugHandler.friends);
+  router.get('/activities', pugHandler.activities);
 
   router.get(
     '/auth/strava',

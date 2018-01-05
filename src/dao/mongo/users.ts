@@ -12,6 +12,7 @@ export interface UserCreateOptions {
   provider: string;
   accessToken: string;
   providerId: string;
+  lastActivitiesSyncedAt: number;
 }
 
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
@@ -55,6 +56,23 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
       { id },
       {
         $set: { accessToken, updatedAt: new Date() },
+      },
+    );
+
+    if (!result.value) {
+      throw new Error(`Cannot update user that does not exist.`);
+    }
+    return result.value;
+  }
+
+  public async updateLastActivitiesSyncedAt(
+    id: string,
+    lastActivitiesSyncedAt: Date,
+  ): Promise<User> {
+    const result = await this.collection().findOneAndUpdate(
+      { id },
+      {
+        $set: { lastActivitiesSyncedAt, updatedAt: new Date() },
       },
     );
 

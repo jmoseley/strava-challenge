@@ -20,6 +20,10 @@ export default class BaseMongoDAO<
     super(loggerFactory);
   }
 
+  public async findById(id: string): Promise<Model> {
+    return await this.collection().findOne({ id });
+  }
+
   public async create(createOptions: CreateOptions): Promise<Model> {
     const model: Model = {
       // TODO: mongo automatically generates an id that is indexed. Maybe we should use that instead?

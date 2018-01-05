@@ -1,3 +1,5 @@
+import { ActivityCreateOptions } from '../mongo/activities';
+
 export interface ProviderUser {
   providerId: string;
   provider: string;
@@ -5,6 +7,12 @@ export interface ProviderUser {
   avatarUrl: string;
 }
 
-export interface BaseProviderDAO<User extends ProviderUser> {
+export interface ProviderActivity extends ActivityCreateOptions {}
+
+export interface BaseProviderDAO<
+  User extends ProviderUser,
+  Activity extends ProviderActivity
+> {
   getFriends(): Promise<User[]>;
+  getActivities(before: Date, after: Date): Promise<ActivityCreateOptions[]>;
 }
