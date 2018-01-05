@@ -39,7 +39,7 @@ export default class BaseMongoDAO<
     );
 
     if (result.insertedCount != models.length) {
-      console.error(
+      this.log.error(
         `Could not insert ${models.length - result.insertedCount} models.`,
         result,
       );
