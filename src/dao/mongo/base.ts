@@ -22,6 +22,7 @@ export default class BaseMongoDAO<
 
   public async create(createOptions: CreateOptions): Promise<Model> {
     const model: Model = {
+      // TODO: mongo automatically generates an id that is indexed. Maybe we should use that instead?
       id: uuid.v4(),
       createAt: new Date(),
       updatedAt: new Date(),

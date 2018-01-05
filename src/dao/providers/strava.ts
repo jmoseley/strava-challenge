@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as URL from 'url-parse';
 import * as util from 'util';
 
-import BaseMongoDAO from '../mongo/base';
 import { BaseProviderDAO, ProviderUser } from './base';
 import { WithLog, LoggerFactory } from '../../logger';
 
