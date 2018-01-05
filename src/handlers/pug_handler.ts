@@ -129,7 +129,7 @@ function isAuthenticated(req: any, res: express.Response, log: LoggerInstance) {
   return true;
 }
 
-function getLogger(handlerName: string, req: any) {
+function getLogger(handlerName: string, req: any): LoggerInstance {
   return req.context.loggerFactory.getLogger(`PugHandler.${handlerName}`);
 }
 
