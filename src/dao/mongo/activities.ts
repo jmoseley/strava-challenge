@@ -16,8 +16,8 @@ export interface ActivityCreateOptions {
   totalTime: number;
   distance: number;
   elevation: number;
-  platform: string;
-  platformId: string;
+  provider: string;
+  providerId: string;
 }
 
 export default class ActivityMongoDAO extends BaseDAO<
@@ -33,11 +33,11 @@ export default class ActivityMongoDAO extends BaseDAO<
 
   public async findActivitiesByUser(userId: string): Promise<Activity[]> {
     const queryResult = await this.collection().find({
-      userId: userId,
+      userId,
     });
 
     let result = await queryResult.toArray();
     this.log.debug(`found ${result.length} activities for user ${userId}...`);
-    return await result;
+    return result;
   }
 }

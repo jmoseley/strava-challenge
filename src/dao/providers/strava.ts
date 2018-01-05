@@ -80,8 +80,8 @@ export default class StravaProviderDAO extends WithLog
       totalTime: rawActivity.elapsed_time,
       distance: rawActivity.distance,
       elevation: rawActivity.total_elevation_gain,
-      platform: 'strava',
-      platformId: '' + rawActivity.id,
+      provider: 'strava',
+      providerId: '' + rawActivity.id,
     };
   }
 }
