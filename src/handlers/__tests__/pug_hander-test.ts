@@ -36,4 +36,6 @@ describe(`PugHandler`, () => {
       expect(res.render).toBeCalledWith('index', {});
     });
   });
+  // TODO: Write tests for /friends
+  // TODO: Write tests for /activities
 });

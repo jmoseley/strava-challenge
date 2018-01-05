@@ -4,6 +4,7 @@ import * as MongoDB from 'mongodb';
 import { config } from '../../config';
 import { getLogger } from '../../logger';
 import UserMongoDAO from './users';
+import ActivityMongoDAO from './activities';
 
 const LOG = getLogger('lib/db');
 
@@ -22,6 +23,7 @@ export default async function middleware(): Promise<express.RequestHandler> {
 
     req.context.daos = {
       user: new UserMongoDAO(req.context.loggerFactory, db),
+      activity: new ActivityMongoDAO(req.context.loggerFactory, db),
     };
 
     next();
