@@ -11,6 +11,8 @@ import {
 import { LoggerInstance } from '../../logger';
 import { isNullOrUndefined } from 'util';
 
+const DEFAULT_SYNC_RANGE_IN_SECONDS = 1209600 * 1000; // 2 weeks
+
 export class ActivityService {
   constructor(
     protected readonly userDAO: UserMongoDAO,
@@ -28,14 +30,22 @@ export class ActivityService {
     let user = await this.userDAO.findById(userId);
     const nextActivityDate = !isNullOrUndefined(user.lastActivitiesSyncedAt)
       ? new Date(new Date(user.lastActivitiesSyncedAt).getTime())
-      : new Date(new Date().getTime() - 1209600 * 1000); // TODO: make this configurable. Currently set to past two weeks.
+      : new Date(new Date().getTime() - DEFAULT_SYNC_RANGE_IN_SECONDS); // TODO: make this configurable. Currently set to past two weeks.
 
     // get all activities from strava after the time activities were last synced.
     const providerActivities = await this.providerDAO.getActivities(
       nextActivityDate,
     );
 
-    let newLastSyncedAt = new Date();
+    let newLastSyncedAt: Date;
+    if (providerActivities.length > 0) {
+      // set to the last activity found
+      newLastSyncedAt =
+        providerActivities[providerActivities.length - 1].startDate;
+    } else {
+      // set to the last time we synced so that next time we sync we can still catch any activities found since
+      newLastSyncedAt = nextActivityDate;
+    }
 
     let activities: Activity[] = [];
     if (providerActivities.length > 0) {
@@ -43,8 +53,16 @@ export class ActivityService {
     }
 
     // set the lastActivitiesSyncedAt to now.
-    // TODO: We might want to set this to the date of the last activity, just in case a ride hasn't been uploaded to
-    // strava yet when we perform the sync.
+    // TODO: How do we want to handle the case where a user hasn't logged in for an extended period of time?
+    // Currently by setting the lastActivitiesSyncedAt property to the last activity found, if the user logs in a month,
+    // or a year, later we could possibly be syncing hundreds of activities.
+    // Solution?: create a queue for accounts to be synced so we can better control rate limiting over the whole service
+    // TODO: Handle case where activities have a start date prior to the date of the last activity found.
+    // Example: I uploaded an activity today, checked StravaChallenge, but forgot to sync my activity from yesterday. I
+    // proceed to upload my activity from yesterday.
+    // Since we've set the lastActivitySyncedAt to the time of the activity today, the activity from yesterday would
+    // never be fetched by StravaChallenge.
+    // Solution?: could handle this by having an option for the user to force sync all activities.
     await this.userDAO.updateLastActivitiesSyncedAt(userId, newLastSyncedAt);
 
     return activities;
