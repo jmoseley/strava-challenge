@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as express from 'express';
 
 import { config } from '../config';
-import { LoggerInstance } from '../logger';
+import { LoggerInstance } from '../lib/logger';
 import StravaProviderDAO from '../dao/providers/strava';
 import { ActivityService } from '../services/activities/activity_service';
 import { FriendService } from '../services/friends/friend_service';

@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as shortid from 'shortid';
 import * as winston from 'winston';
 
-import { config } from './config';
+import { config } from '../config';
 
 export class WithLog {
   protected readonly log: LoggerInstance;

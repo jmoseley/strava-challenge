@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../lib/logger';
 import BaseDAO, { BaseModel } from './base';
 
 // TODO: move these models out of the 'mongo dao' in case we want other sources besides mongo.

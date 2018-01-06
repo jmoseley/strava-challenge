@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../lib/logger';
 import BaseDAO, { BaseModel } from './base';
 
 export interface User extends UserCreateOptions, BaseModel {}

@@ -12,9 +12,8 @@ import { Server } from 'net';
 import * as pugHandler from './handlers/pug_handler';
 import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
-import { getLogger, middleware as loggerMiddleware } from './logger';
+import { getLogger, middleware as loggerMiddleware } from './lib/logger';
 import { getSessionStore } from './lib/session_store';
-import dbMiddleware from './dao/mongo/middleware';
 
 const LOG = getLogger('main');
 
@@ -75,7 +74,6 @@ export async function main() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(await dbMiddleware());
 
   const router = Router();
   router.get('/', pugHandler.index);
