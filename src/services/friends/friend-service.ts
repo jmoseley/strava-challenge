@@ -23,7 +23,6 @@ export class FriendService {
     // Non-potential friends are friends that aren't on the platform yet, and need to be invited.
     // TODO: Eventually we should just create a user object for all these users that we find.
 
-    // TODO: Move this into a service outside of the handler.
     // Look up all the friends in one query.
     const friendUsers = await this.userDAO.findUsers(
       _.map(providerFriends, f => ({
