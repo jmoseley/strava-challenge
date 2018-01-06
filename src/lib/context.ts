@@ -20,8 +20,6 @@ export interface RequestContext
 
 export interface ContextedRequest extends express.Request {
   context: RequestContext;
-  // This allows us to skip type checking for the session.
-  session: Express.Session;
 }
 
 const shortUUIDFormat = shortUUID(shortUUID.constants.flickrBase58);

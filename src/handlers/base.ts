@@ -26,11 +26,9 @@ export function requestHandler(
     const log = req.context.loggerFactory.getLogger('RequestHandler');
 
     let session: Express.Session = {} as any;
-    if (requiresAuthentication) {
-      session = _.get(req, 'session');
-      if (!session) {
-        throw new Error(`Not authenticated`);
-      }
+    session = _.get(req, 'session') as Express.Session;
+    if (requiresAuthentication && !session) {
+      throw new Error(`Not authenticated`);
     }
 
     const result = await handler(req.context, session);

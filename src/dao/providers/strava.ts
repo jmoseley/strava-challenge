@@ -3,7 +3,7 @@ import * as URL from 'url-parse';
 import * as util from 'util';
 
 import { BaseProviderDAO, ProviderActivity, ProviderUser } from './base';
-import { WithLog, LoggerFactory } from '../../logger';
+import { WithLog, LoggerFactory } from '../../lib/logger';
 import { isNullOrUndefined } from 'util';
 
 // OMG types....
