@@ -5,6 +5,7 @@ import {
   ProviderUser,
 } from '../../dao/providers/base';
 import * as _ from 'lodash';
+import { LoggerInstance } from '../../logger';
 
 export class FriendService {
   constructor(
@@ -13,6 +14,7 @@ export class FriendService {
       ProviderUser,
       ProviderActivity
     >,
+    protected readonly log: LoggerInstance,
   ) {}
 
   async getFriends(userId: string): Promise<[ProviderUser[], ProviderUser[]]> {

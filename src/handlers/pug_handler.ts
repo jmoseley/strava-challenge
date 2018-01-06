@@ -4,8 +4,8 @@ import * as express from 'express';
 import { config } from '../config';
 import { LoggerInstance } from '../logger';
 import StravaProviderDAO from '../dao/providers/strava';
-import { ActivityService } from '../services/activities/activity-service';
-import { FriendService } from '../services/friends/friend-service';
+import { ActivityService } from '../services/activities/activity_service';
+import { FriendService } from '../services/friends/friend_service';
 
 export async function index(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PugHandler.index');
@@ -37,6 +37,7 @@ export async function friends(req: any, res: express.Response) {
   const friendService = new FriendService(
     req.context.daos.user,
     stravaProvider,
+    log,
   );
 
   const [potentialFriends, needInviteFriends] = await friendService.getFriends(
