@@ -75,18 +75,12 @@ export function getLogger(name: string) {
   return GLOBAL_LOGGER_FACTORY.getLogger(name);
 }
 
-export function middleware(): express.RequestHandler {
-  // Type req as any so we can do stuff to it.
-  return (req: any, res, next) => {
-    if (!req.context) {
-      req.context = {};
-    }
-    // TODO: Get this from headers if provided.
-    if (!req.context.traceId) {
-      req.context.traceId = shortid.generate();
-    }
-    req.context.loggerFactory = new LoggerFactory(req.context.traceId);
+export interface LoggerRequestContext {
+  loggerFactory: LoggerFactory;
+}
 
-    next();
+export function getRequestContext(traceId: string): LoggerRequestContext {
+  return {
+    loggerFactory: new LoggerFactory(traceId),
   };
 }
