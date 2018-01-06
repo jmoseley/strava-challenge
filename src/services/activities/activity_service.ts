@@ -25,12 +25,12 @@ export class ActivityService {
   ) {}
 
   async syncActivities(userId: string): Promise<Activity[]> {
-    // get the last time activities were synced for the user. if activites have never been synced, get the activities for
-    // the past two weeks.
+    // get the last time activities were synced for the user. if activities have never been synced,
+    // get the activities for the past DEFAULT_SYNC_RANGE_IN_SECONDS.
     let user = await this.userDAO.findById(userId);
     const nextActivityDate = !isNullOrUndefined(user.lastActivitiesSyncedAt)
       ? new Date(new Date(user.lastActivitiesSyncedAt).getTime())
-      : new Date(new Date().getTime() - DEFAULT_SYNC_RANGE_IN_SECONDS); // TODO: make this configurable. Currently set to past two weeks.
+      : new Date(new Date().getTime() - DEFAULT_SYNC_RANGE_IN_SECONDS); // TODO: make this configurable.
 
     // get all activities from strava after the time activities were last synced.
     const providerActivities = await this.providerDAO.getActivities(
