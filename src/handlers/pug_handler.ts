@@ -4,8 +4,8 @@ import * as express from 'express';
 import { config } from '../config';
 import { LoggerInstance } from '../logger';
 import StravaProviderDAO from '../dao/providers/strava';
-import ActivityMongoDAO from '../dao/mongo/activities';
-import { isNullOrUndefined } from 'util';
+import { ActivityService } from '../services/activities/activity_service';
+import { FriendService } from '../services/friends/friend_service';
 
 export async function index(req: any, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PugHandler.index');
@@ -28,34 +28,20 @@ export async function friends(req: any, res: express.Response) {
     return;
   }
 
+  // TODO: Provide these in the request container.
   const stravaProvider = new StravaProviderDAO(
     req.session.user.id,
     req.session.user.accessToken,
     req.context.loggerFactory,
   );
-  const stravaFriends = await stravaProvider.getFriends();
-
-  // Parition by friends that are already in the database.
-  // Potential friends are friends that are already on the plgatform.
-  // Non-potential friends are friends that aren't on the platform yet, and need to be invited.
-  // TODO: Eventually we should just create a user object for all these users that we find.
-
-  // TODO: Move this into a service outside of the handler.
-  // Look up all the friends in one query.
-  const friendUsers = await req.context.daos.user.findUsers(
-    _.map(stravaFriends, f => ({
-      provider: f.provider,
-      providerId: f.providerId,
-    })),
+  const friendService = new FriendService(
+    req.context.daos.user,
+    stravaProvider,
+    log,
   );
-  const [potentialFriends, needInviteFriends] = _.partition(
-    stravaFriends,
-    stravaFriend => {
-      return !!_.find(
-        friendUsers,
-        friendUser => stravaFriend.providerId === friendUser.providerId,
-      );
-    },
+
+  const [potentialFriends, needInviteFriends] = await friendService.getFriends(
+    req.session.user.id,
   );
 
   // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
@@ -76,7 +62,20 @@ export async function activities(req: any, res: express.Response) {
     return;
   }
 
-  await syncStravaActivities(req, res, log);
+  // TODO: Provide these in the request container.
+  const stravaProvider = new StravaProviderDAO(
+    req.session.user.id,
+    req.session.user.accessToken,
+    req.context.loggerFactory,
+  );
+  const activityService = new ActivityService(
+    req.context.daos.user,
+    req.context.daos.activity,
+    stravaProvider,
+    log,
+  );
+
+  await activityService.syncActivities(req.session.user.id);
 
   context.activities = await req.context.daos.activity.findActivitiesByUser(
     req.session.user.id,
@@ -84,42 +83,13 @@ export async function activities(req: any, res: express.Response) {
 
   res.render('activities', context);
 }
-async function syncStravaActivities(
+
+// TODO: consider moving the following functions into a base handler class
+function isAuthenticated(
   req: any,
   res: express.Response,
   log: LoggerInstance,
-) {
-  const stravaProvider = new StravaProviderDAO(
-    req.session.user.id,
-    req.session.user.accessToken,
-    req.context.loggerFactory,
-  );
-
-  // get the last time activities were synced for the user. if activites have never been synced, get the activities for
-  // the past two weeks.
-  let user = await req.context.daos.user.findById(req.session.user.id);
-  const nextActivityDate = !isNullOrUndefined(user.lastActivitiesSyncedAt)
-    ? new Date(new Date(user.lastActivitiesSyncedAt).getTime())
-    : new Date(new Date().getTime() - 1209600 * 1000); // TODO: make this configurable. Currently set to past two weeks.
-
-  // get all activities from strava after the time activities were last synced.
-  const stravaActivities = await stravaProvider.getActivities(nextActivityDate);
-
-  let newLastSyncedAt = new Date();
-
-  req.context.daos.activity.createMultiple(stravaActivities);
-
-  // set the lastActivitiesSyncedAt to now.
-  // TODO: We might want to set this to the date of the last activity, just in case a ride hasn't been uploaded to
-  // strava yet when we perform the sync.
-  await req.context.daos.user.updateLastActivitiesSyncedAt(
-    req.session.user.id,
-    newLastSyncedAt,
-  );
-}
-
-// TODO: consider moving the following functions into a base handler class
-function isAuthenticated(req: any, res: express.Response, log: LoggerInstance) {
+): boolean {
   if (!req.session.user) {
     log.debug(`No user in session, redirecting`);
     res.redirect(`/`);
