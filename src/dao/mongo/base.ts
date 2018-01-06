@@ -2,7 +2,7 @@ import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 import _ = require('lodash');
 
-import { LoggerFactory, WithLog } from '../../logger';
+import { LoggerFactory, WithLog } from '../../lib/logger';
 
 export interface BaseModel {
   id: string;
