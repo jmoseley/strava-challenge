@@ -6,8 +6,9 @@ import { LoggerInstance } from '../lib/logger';
 import StravaProviderDAO from '../dao/providers/strava';
 import { ActivityService } from '../services/activities/activity_service';
 import { FriendService } from '../services/friends/friend_service';
+import { ContextedRequest } from '../lib/context';
 
-export async function index(req: any, res: express.Response) {
+export async function index(req: ContextedRequest, res: express.Response) {
   const log = req.context.loggerFactory.getLogger('PugHandler.index');
   const context = getSharedTemplateContext(req, log);
 
@@ -20,7 +21,7 @@ export async function index(req: any, res: express.Response) {
 // When request is accepted, we create a friendship, and delete the request
 // Frienship:
 // user1Id, user2Id
-export async function friends(req: any, res: express.Response) {
+export async function friends(req: ContextedRequest, res: express.Response) {
   const log = getLogger('friends', req);
   const context = getSharedTemplateContext(req, log);
 
@@ -54,7 +55,7 @@ export async function friends(req: any, res: express.Response) {
   res.render('friends', context);
 }
 
-export async function activities(req: any, res: express.Response) {
+export async function activities(req: ContextedRequest, res: express.Response) {
   const log = getLogger('activities', req);
   const context = getSharedTemplateContext(req, log);
 
@@ -86,11 +87,11 @@ export async function activities(req: any, res: express.Response) {
 
 // TODO: consider moving the following functions into a base handler class
 function isAuthenticated(
-  req: any,
+  req: ContextedRequest,
   res: express.Response,
   log: LoggerInstance,
 ): boolean {
-  if (!req.session.user) {
+  if (!_.get(req, 'session.user')) {
     log.debug(`No user in session, redirecting`);
     res.redirect(`/`);
     return false;
@@ -99,11 +100,14 @@ function isAuthenticated(
   return true;
 }
 
-function getLogger(handlerName: string, req: any): LoggerInstance {
+function getLogger(handlerName: string, req: ContextedRequest): LoggerInstance {
   return req.context.loggerFactory.getLogger(`PugHandler.${handlerName}`);
 }
 
-function getSharedTemplateContext(req: any, log: LoggerInstance): any {
+function getSharedTemplateContext(
+  req: ContextedRequest,
+  log: LoggerInstance,
+): any {
   const user = _.get(req, 'session.user');
   if (user) {
     log.debug(`Found user in session.`, { displayName: user.displayName });

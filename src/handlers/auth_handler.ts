@@ -2,9 +2,14 @@ import * as _ from 'lodash';
 import * as express from 'express';
 
 import { User } from '../dao/mongo/users';
+import { ContextedRequest } from '../lib/context';
 
 // Once this handler gets too big, let's break it out into actions.
-export async function callback(req: any, res: any, next: express.NextFunction) {
+export async function callback(
+  req: ContextedRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
   const log = req.context.loggerFactory.getLogger('AuthHandler.callback');
   log.info(`Callback from oauth`);
 
@@ -49,7 +54,11 @@ export async function callback(req: any, res: any, next: express.NextFunction) {
   }
 }
 
-export function logout(req: any, res: any, next: express.NextFunction) {
+export function logout(
+  req: ContextedRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
   req.logout();
   req.session.destroy(() => {
     res.redirect('/'); //Inside a callback… bulletproof!
