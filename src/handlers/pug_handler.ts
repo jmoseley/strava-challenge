@@ -2,18 +2,22 @@ import * as _ from 'lodash';
 import * as express from 'express';
 
 import { config } from '../config';
-import { LoggerInstance } from '../lib/logger';
+import { LoggerInstance, LoggerFactory } from '../lib/logger';
 import StravaProviderDAO from '../dao/providers/strava';
 import { ActivityService } from '../services/activities/activity_service';
 import { FriendService } from '../services/friends/friend_service';
-import { ContextedRequest } from '../lib/context';
+import { ContextedRequest, RequestContext } from '../lib/context';
+import { requestHandler } from './base';
 
-export async function index(req: ContextedRequest, res: express.Response) {
-  const log = req.context.loggerFactory.getLogger('PugHandler.index');
-  const context = getSharedTemplateContext(req, log);
+export const index = requestHandler(
+  false,
+  async (context: RequestContext, session: Express.Session) => {
+    const log = getLogger('PugHandler.index', context);
+    const templateContext = getSharedTemplateContext(session, log);
 
-  res.render('index', context);
-}
+    return { template: { name: 'index', context: templateContext } };
+  },
+);
 
 // Data layout for friends:
 // Friend Request:
@@ -21,94 +25,81 @@ export async function index(req: ContextedRequest, res: express.Response) {
 // When request is accepted, we create a friendship, and delete the request
 // Frienship:
 // user1Id, user2Id
-export async function friends(req: ContextedRequest, res: express.Response) {
-  const log = getLogger('friends', req);
-  const context = getSharedTemplateContext(req, log);
+export const friends = requestHandler(
+  true,
+  async (context: RequestContext, session: Express.Session) => {
+    const log = getLogger('friends', context);
+    const templateContext = getSharedTemplateContext(session, log);
 
-  if (!isAuthenticated(req, res, log)) {
-    return;
-  }
+    // TODO: Provide these in the request container.
+    const stravaProvider = new StravaProviderDAO(
+      session.user.id,
+      session.user.accessToken,
+      context.loggerFactory,
+    );
+    const friendService = new FriendService(
+      context.daos.user,
+      stravaProvider,
+      log,
+    );
 
-  // TODO: Provide these in the request container.
-  const stravaProvider = new StravaProviderDAO(
-    req.session.user.id,
-    req.session.user.accessToken,
-    req.context.loggerFactory,
-  );
-  const friendService = new FriendService(
-    req.context.daos.user,
-    stravaProvider,
-    log,
-  );
+    const [
+      potentialFriends,
+      needInviteFriends,
+    ] = await friendService.getFriends(session.user.id);
 
-  const [potentialFriends, needInviteFriends] = await friendService.getFriends(
-    req.session.user.id,
-  );
+    // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
+    // friendship automatically.
 
-  // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
-  // friendship automatically.
+    // TODO: Filter out people that are already friends.
+    templateContext.potentialFriends = potentialFriends;
+    templateContext.needInviteFriends = needInviteFriends;
 
-  // TODO: Filter out people that are already friends.
-  context.potentialFriends = potentialFriends;
-  context.needInviteFriends = needInviteFriends;
+    return { template: { name: 'friends', context: templateContext } };
+  },
+);
 
-  res.render('friends', context);
-}
+export const activities = requestHandler(
+  true,
+  async (context: RequestContext, session: Express.Session) => {
+    const log = getLogger('activities', context);
+    const templateContext = getSharedTemplateContext(session, log);
 
-export async function activities(req: ContextedRequest, res: express.Response) {
-  const log = getLogger('activities', req);
-  const context = getSharedTemplateContext(req, log);
+    // TODO: Provide these in the request container.
+    const stravaProvider = new StravaProviderDAO(
+      session.user.id,
+      session.user.accessToken,
+      context.loggerFactory,
+    );
+    const activityService = new ActivityService(
+      context.daos.user,
+      context.daos.activity,
+      stravaProvider,
+      log,
+    );
 
-  if (!isAuthenticated(req, res, log)) {
-    return;
-  }
+    await activityService.syncActivities(session.user.id);
 
-  // TODO: Provide these in the request container.
-  const stravaProvider = new StravaProviderDAO(
-    req.session.user.id,
-    req.session.user.accessToken,
-    req.context.loggerFactory,
-  );
-  const activityService = new ActivityService(
-    req.context.daos.user,
-    req.context.daos.activity,
-    stravaProvider,
-    log,
-  );
+    templateContext.activities = await context.daos.activity.findActivitiesByUser(
+      session.user.id,
+    );
 
-  await activityService.syncActivities(req.session.user.id);
+    return { template: { name: 'activities', context: templateContext } };
+  },
+);
 
-  context.activities = await req.context.daos.activity.findActivitiesByUser(
-    req.session.user.id,
-  );
-
-  res.render('activities', context);
-}
-
-// TODO: consider moving the following functions into a base handler class
-function isAuthenticated(
-  req: ContextedRequest,
-  res: express.Response,
-  log: LoggerInstance,
-): boolean {
-  if (!_.get(req, 'session.user')) {
-    log.debug(`No user in session, redirecting`);
-    res.redirect(`/`);
-    return false;
-  }
-
-  return true;
-}
-
-function getLogger(handlerName: string, req: ContextedRequest): LoggerInstance {
-  return req.context.loggerFactory.getLogger(`PugHandler.${handlerName}`);
+function getLogger(
+  handlerName: string,
+  context: RequestContext,
+): LoggerInstance {
+  return context.loggerFactory.getLogger(`PugHandler.${handlerName}`);
 }
 
 function getSharedTemplateContext(
-  req: ContextedRequest,
+  session: Express.Session,
   log: LoggerInstance,
 ): any {
-  const user = _.get(req, 'session.user');
+  const user = _.get(session, 'user');
   if (user) {
     log.debug(`Found user in session.`, { displayName: user.displayName });
   }
