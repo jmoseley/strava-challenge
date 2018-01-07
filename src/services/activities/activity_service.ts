@@ -9,6 +9,7 @@ import {
   BaseProviderDAO,
   ProviderActivity,
   ProviderUser,
+  AuthenticatedUser,
 } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
@@ -37,6 +38,7 @@ export class ActivityService extends WithLog {
 
     // get all activities from strava after the time activities were last synced.
     const providerActivities = await this.providerDAO.getActivities(
+      user,
       nextActivityDate,
     );
 

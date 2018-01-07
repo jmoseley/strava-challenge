@@ -5,6 +5,7 @@ import * as util from 'util';
 import { BaseProviderDAO, ProviderActivity, ProviderUser } from './base';
 import { WithLog, LoggerFactory } from '../../lib/logger';
 import { isNullOrUndefined } from 'util';
+import { User } from '../mongo/users';
 
 // OMG types....
 const strava = require('strava-v3');
@@ -12,21 +13,17 @@ const listFriends = util.promisify(strava.athlete.listFriends);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
 export interface StravaUser extends ProviderUser {}
-export interface AuthenticatedStravaUser extends StravaUser {
-  userId: string;
+export interface AuthenticatedStravaUser {
+  id: string;
   accessToken: string;
 }
 
 export interface StravaActivity extends ProviderActivity {}
 
 export default class StravaProviderDAO extends WithLog
-  implements BaseProviderDAO<
-      AuthenticatedStravaUser,
-      StravaUser,
-      StravaActivity
-    > {
+  implements BaseProviderDAO<StravaUser, StravaActivity> {
   public async getActivities(
-    user: AuthenticatedStravaUser,
+    user: User,
     afterDate?: Date,
   ): Promise<StravaActivity[]> {
     const afterSeconds = !isNullOrUndefined(afterDate)
@@ -78,11 +75,11 @@ export default class StravaProviderDAO extends WithLog
   }
 
   private convertActivity(
-    sourceUser: AuthenticatedStravaUser,
+    sourceUser: User,
     rawActivity: RawStravaActivity,
   ): StravaActivity {
     return {
-      userId: sourceUser.userId,
+      userId: sourceUser.id,
       name: rawActivity.name,
       type: rawActivity.type,
       startDate: new Date(rawActivity.start_date),

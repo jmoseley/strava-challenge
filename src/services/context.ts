@@ -5,12 +5,13 @@ import {
   BaseProviderDAO,
   ProviderUser,
   ProviderActivity,
+  AuthenticatedUser,
 } from '../dao/providers/base';
 import { LoggerFactory } from '../lib/logger';
 import ActivityMongoDAO from '../dao/mongo/activities';
 
 export interface ServiceRequestContext {
-  services?: {
+  services: {
     friends: FriendService;
     activities: ActivityService;
   };
@@ -20,12 +21,8 @@ export function getRequestContext(
   loggerFactory: LoggerFactory,
   userDao: UserMongoDAO,
   activityDao: ActivityMongoDAO,
-  providerDao?: BaseProviderDAO<ProviderUser, ProviderActivity>,
+  providerDao: BaseProviderDAO<ProviderUser, ProviderActivity>,
 ): ServiceRequestContext {
-  if (!providerDao) {
-    return {};
-  }
-
   return {
     services: {
       friends: new FriendService(loggerFactory, userDao, providerDao),

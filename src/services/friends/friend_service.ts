@@ -14,7 +14,6 @@ export class FriendService extends WithLog {
     loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
     protected readonly providerDAO: BaseProviderDAO<
-      AuthenticatedUser,
       ProviderUser,
       ProviderActivity
     >,
@@ -23,7 +22,12 @@ export class FriendService extends WithLog {
   }
 
   async getFriends(userId: string): Promise<[ProviderUser[], ProviderUser[]]> {
-    const providerFriends = await this.providerDAO.getFriends();
+    let user = await this.userDAO.findById(userId);
+    if (!user) {
+      // TODO: 404
+      throw new Error(`User not found.`);
+    }
+    const providerFriends = await this.providerDAO.getFriends(user);
 
     // Parition by friends that are already in the database.
     // Potential friends are friends that are already on the plgatform.

@@ -1,4 +1,5 @@
 import { ActivityCreateOptions } from '../mongo/activities';
+import { User } from '../mongo/users';
 
 export interface ProviderUser {
   providerId: string;
@@ -10,14 +11,15 @@ export interface ProviderUser {
 export interface ProviderActivity extends ActivityCreateOptions {}
 
 export interface AuthenticatedUser {
-  userId: string;
+  id: string;
 }
 
+// I'm on the fence about the providers needing to know how to get auth information from the user model, but
+// it needs to live somewhere :(
 export interface BaseProviderDAO<
-  AuthUser extends AuthenticatedUser,
-  User extends ProviderUser,
-  Activity extends ProviderActivity
+  PUser extends ProviderUser,
+  PActivity extends ProviderActivity
 > {
-  getFriends(user: AuthUser): Promise<User[]>;
-  getActivities(user: AuthUser, afterDate: Date): Promise<Activity[]>;
+  getFriends(user: User): Promise<PUser[]>;
+  getActivities(user: User, afterDate: Date): Promise<PActivity[]>;
 }

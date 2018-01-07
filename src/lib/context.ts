@@ -48,14 +48,12 @@ export async function getContextGeneratorMiddleware() {
         const loggerContext = loggerContextGenerator(traceId);
         const daoContext = daoContextGenerator(loggerContext.loggerFactory);
         // This got really messy. We need to clean up the patterns around providers. I will do that in a later
-        // PR.
+        // PR. Specifically, how do we handle this when there are many providers??
         const serviceContext = serviceContextGenerator(
           loggerContext.loggerFactory,
           daoContext.daos.user,
           daoContext.daos.activity,
-          _.get(daoContext, 'daos.providers.strava') as
-            | StravaProviderDAO
-            | undefined,
+          daoContext.daos.providers.strava,
         );
 
         const context: RequestContext = {
