@@ -5,7 +5,6 @@ import {
   BaseProviderDAO,
   ProviderUser,
   ProviderActivity,
-  AuthenticatedUser,
 } from '../dao/providers/base';
 import { LoggerFactory } from '../lib/logger';
 import ActivityMongoDAO from '../dao/mongo/activities';

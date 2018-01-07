@@ -13,10 +13,6 @@ const listFriends = util.promisify(strava.athlete.listFriends);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
 export interface StravaUser extends ProviderUser {}
-export interface AuthenticatedStravaUser {
-  id: string;
-  accessToken: string;
-}
 
 export interface StravaActivity extends ProviderActivity {}
 
@@ -47,9 +43,7 @@ export default class StravaProviderDAO extends WithLog
     });
   }
 
-  public async getFriends(
-    user: AuthenticatedStravaUser,
-  ): Promise<StravaUser[]> {
+  public async getFriends(user: User): Promise<StravaUser[]> {
     const rawFriends: RawStravaUser[] = await listFriends({
       access_token: user.accessToken,
     });

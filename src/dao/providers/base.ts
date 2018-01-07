@@ -10,10 +10,6 @@ export interface ProviderUser {
 
 export interface ProviderActivity extends ActivityCreateOptions {}
 
-export interface AuthenticatedUser {
-  id: string;
-}
-
 // I'm on the fence about the providers needing to know how to get auth information from the user model, but
 // it needs to live somewhere :(
 export interface BaseProviderDAO<

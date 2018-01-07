@@ -9,7 +9,6 @@ import {
   BaseProviderDAO,
   ProviderActivity,
   ProviderUser,
-  AuthenticatedUser,
 } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
