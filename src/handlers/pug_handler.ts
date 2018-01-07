@@ -31,22 +31,10 @@ export const friends = requestHandler(
     const log = getLogger('friends', context);
     const templateContext = getSharedTemplateContext(session, log);
 
-    // TODO: Provide these in the request container.
-    const stravaProvider = new StravaProviderDAO(
-      session.user.id,
-      session.user.accessToken,
-      context.loggerFactory,
-    );
-    const friendService = new FriendService(
-      context.daos.user,
-      stravaProvider,
-      log,
-    );
-
     const [
       potentialFriends,
       needInviteFriends,
-    ] = await friendService.getFriends(session.user.id);
+    ] = await context.services.friends.getFriends(session.user.id);
 
     // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
     // friendship automatically.
@@ -65,20 +53,7 @@ export const activities = requestHandler(
     const log = getLogger('activities', context);
     const templateContext = getSharedTemplateContext(session, log);
 
-    // TODO: Provide these in the request container.
-    const stravaProvider = new StravaProviderDAO(
-      session.user.id,
-      session.user.accessToken,
-      context.loggerFactory,
-    );
-    const activityService = new ActivityService(
-      context.daos.user,
-      context.daos.activity,
-      stravaProvider,
-      log,
-    );
-
-    await activityService.syncActivities(session.user.id);
+    await context.services.activities.syncActivities(session.user.id);
 
     templateContext.activities = await context.daos.activity.findActivitiesByUser(
       session.user.id,

@@ -1,24 +1,32 @@
+import * as _ from 'lodash';
+
 import { User, default as UserMongoDAO } from '../../dao/mongo/users';
 import {
   BaseProviderDAO,
   ProviderActivity,
   ProviderUser,
 } from '../../dao/providers/base';
-import * as _ from 'lodash';
-import { LoggerInstance } from '../../lib/logger';
+import { LoggerFactory, WithLog } from '../../lib/logger';
 
-export class FriendService {
+export class FriendService extends WithLog {
   constructor(
+    loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
     protected readonly providerDAO: BaseProviderDAO<
       ProviderUser,
       ProviderActivity
     >,
-    protected readonly log: LoggerInstance,
-  ) {}
+  ) {
+    super(loggerFactory);
+  }
 
   async getFriends(userId: string): Promise<[ProviderUser[], ProviderUser[]]> {
-    const providerFriends = await this.providerDAO.getFriends();
+    let user = await this.userDAO.findById(userId);
+    if (!user) {
+      // TODO: 404
+      throw new Error(`User not found.`);
+    }
+    const providerFriends = await this.providerDAO.getFriends(user);
 
     // Parition by friends that are already in the database.
     // Potential friends are friends that are already on the plgatform.

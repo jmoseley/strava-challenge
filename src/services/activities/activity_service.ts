@@ -1,3 +1,5 @@
+import { isNullOrUndefined } from 'util';
+
 import {
   Activity,
   default as ActivityMongoDAO,
@@ -8,21 +10,22 @@ import {
   ProviderActivity,
   ProviderUser,
 } from '../../dao/providers/base';
-import { LoggerInstance } from '../../lib/logger';
-import { isNullOrUndefined } from 'util';
+import { LoggerFactory, WithLog } from '../../lib/logger';
 
 const DEFAULT_SYNC_RANGE_IN_SECONDS = 1209600 * 1000; // 2 weeks
 
-export class ActivityService {
+export class ActivityService extends WithLog {
   constructor(
+    loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
     protected readonly activityDAO: ActivityMongoDAO,
     protected readonly providerDAO: BaseProviderDAO<
       ProviderUser,
       ProviderActivity
     >,
-    protected readonly log: LoggerInstance,
-  ) {}
+  ) {
+    super(loggerFactory);
+  }
 
   async syncActivities(userId: string): Promise<Activity[]> {
     // get the last time activities were synced for the user. if activities have never been synced,
@@ -34,6 +37,7 @@ export class ActivityService {
 
     // get all activities from strava after the time activities were last synced.
     const providerActivities = await this.providerDAO.getActivities(
+      user,
       nextActivityDate,
     );
 

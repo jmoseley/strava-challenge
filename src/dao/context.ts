@@ -3,9 +3,10 @@ import * as MongoDB from 'mongodb';
 
 import { config } from '../config';
 import { getLogger, LoggerFactory } from '../lib/logger';
-import UserMongoDAO from './mongo/users';
+import UserMongoDAO, { User } from './mongo/users';
 import ActivityMongoDAO from './mongo/activities';
 import { ContextedRequest } from '../lib/context';
+import StravaProviderDAO from './providers/strava';
 
 const LOG = getLogger('lib/db');
 
@@ -13,6 +14,9 @@ export interface DaoRequestContext {
   daos: {
     user: UserMongoDAO;
     activity: ActivityMongoDAO;
+    providers: {
+      strava: StravaProviderDAO;
+    };
   };
 }
 
@@ -28,6 +32,9 @@ export async function getRequestContextGenerator() {
       daos: {
         user: new UserMongoDAO(loggerFactory, db),
         activity: new ActivityMongoDAO(loggerFactory, db),
+        providers: {
+          strava: new StravaProviderDAO(loggerFactory),
+        },
       },
     };
   };
