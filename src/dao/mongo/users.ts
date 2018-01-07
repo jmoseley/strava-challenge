@@ -17,6 +17,10 @@ export interface UserCreateOptions {
       accessToken: string;
       providerId: string;
     };
+    [key: string]: {
+      accessToken: string;
+      providerId: string;
+    };
   };
 }
 

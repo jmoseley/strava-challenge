@@ -1,21 +1,15 @@
 import * as _ from 'lodash';
 
 import { User, default as UserMongoDAO } from '../../dao/mongo/users';
-import {
-  BaseProviderDAO,
-  ProviderActivity,
-  ProviderUser,
-} from '../../dao/providers/base';
+import { ProviderActivity, ProviderUser } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
+import { AllProvidersDao } from '../../dao/providers/all';
 
 export class FriendService extends WithLog {
   constructor(
     loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
-    protected readonly providerDAO: BaseProviderDAO<
-      ProviderUser,
-      ProviderActivity
-    >,
+    protected readonly providerDAO: AllProvidersDao,
   ) {
     super(loggerFactory);
   }
@@ -41,11 +35,12 @@ export class FriendService extends WithLog {
       })),
     );
 
-    const providerId = this.providerDAO.getProviderId(user);
     return _.partition(providerFriends, providerFriend => {
       return !!_.find(
         friendUsers,
-        friendUser => providerFriend.providerId === providerId,
+        friendUser =>
+          providerFriend.providerId ===
+          friendUser.providers[providerFriend.provider].providerId,
       );
     });
   }

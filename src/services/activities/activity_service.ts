@@ -5,12 +5,9 @@ import {
   default as ActivityMongoDAO,
 } from '../../dao/mongo/activities';
 import UserMongoDAO from '../../dao/mongo/users';
-import {
-  BaseProviderDAO,
-  ProviderActivity,
-  ProviderUser,
-} from '../../dao/providers/base';
+import { ProviderActivity, ProviderUser } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
+import { AllProvidersDao } from '../../dao/providers/all';
 
 const DEFAULT_SYNC_RANGE_IN_SECONDS = 1209600 * 1000; // 2 weeks
 
@@ -19,10 +16,7 @@ export class ActivityService extends WithLog {
     loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
     protected readonly activityDAO: ActivityMongoDAO,
-    protected readonly providerDAO: BaseProviderDAO<
-      ProviderUser,
-      ProviderActivity
-    >,
+    protected readonly providerDAO: AllProvidersDao,
   ) {
     super(loggerFactory);
   }

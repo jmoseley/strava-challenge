@@ -12,16 +12,12 @@ const strava = require('strava-v3');
 const listFriends = util.promisify(strava.athlete.listFriends);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
-export interface StravaUser extends ProviderUser {}
-
-export interface StravaActivity extends ProviderActivity {}
-
 export default class StravaProviderDAO extends WithLog
-  implements BaseProviderDAO<StravaUser, StravaActivity> {
+  implements BaseProviderDAO {
   public async getActivities(
     user: User,
     afterDate?: Date,
-  ): Promise<StravaActivity[]> {
+  ): Promise<ProviderActivity[]> {
     const authData = this.getAuthData(user);
 
     const afterSeconds = !isNullOrUndefined(afterDate)
@@ -45,7 +41,7 @@ export default class StravaProviderDAO extends WithLog
     });
   }
 
-  public async getFriends(user: User): Promise<StravaUser[]> {
+  public async getFriends(user: User): Promise<ProviderUser[]> {
     const authData = this.getAuthData(user);
 
     const rawFriends: RawStravaUser[] = await listFriends({
@@ -55,10 +51,6 @@ export default class StravaProviderDAO extends WithLog
     return _.map(rawFriends, this.convertUser);
   }
 
-  public getProviderId(user: User): string {
-    return user.providers.strava.providerId;
-  }
-
   private getAuthData(user: User): { accessToken: string; providerId: string } {
     return {
       accessToken: user.providers.strava.accessToken,
@@ -66,7 +58,7 @@ export default class StravaProviderDAO extends WithLog
     };
   }
 
-  private convertUser(rawUser: RawStravaUser): StravaUser {
+  private convertUser(rawUser: RawStravaUser): ProviderUser {
     // Handles default profile images that look like 'avatar/athlete/large.png' or 'avatar/athlete/medium.png'
     if (rawUser.profile) {
       const profileUrl = URL(rawUser.profile);
@@ -86,7 +78,7 @@ export default class StravaProviderDAO extends WithLog
   private convertActivity(
     sourceUser: User,
     rawActivity: RawStravaActivity,
-  ): StravaActivity {
+  ): ProviderActivity {
     return {
       userId: sourceUser.id,
       name: rawActivity.name,
