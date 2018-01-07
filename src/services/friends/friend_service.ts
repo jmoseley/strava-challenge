@@ -5,7 +5,7 @@ import {
   ProviderUser,
 } from '../../dao/providers/base';
 import * as _ from 'lodash';
-import { LoggerInstance } from '../../logger';
+import { LoggerInstance } from '../../lib/logger';
 
 export class FriendService {
   constructor(

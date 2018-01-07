@@ -8,7 +8,7 @@ import {
   ProviderActivity,
   ProviderUser,
 } from '../../dao/providers/base';
-import { LoggerInstance } from '../../logger';
+import { LoggerInstance } from '../../lib/logger';
 import { isNullOrUndefined } from 'util';
 
 const DEFAULT_SYNC_RANGE_IN_SECONDS = 1209600 * 1000; // 2 weeks

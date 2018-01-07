@@ -12,9 +12,9 @@ import { Server } from 'net';
 import * as pugHandler from './handlers/pug_handler';
 import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
-import { getLogger, middleware as loggerMiddleware } from './logger';
+import { getLogger } from './lib/logger';
 import { getSessionStore } from './lib/session_store';
-import dbMiddleware from './dao/mongo/middleware';
+import { getContextGeneratorMiddleware } from './lib/context';
 
 const LOG = getLogger('main');
 
@@ -58,9 +58,12 @@ passport.use(
 // Exported just for tests.
 export async function main() {
   LOG.info('Starting server...');
+
+  const contextMiddleware = await getContextGeneratorMiddleware();
+
   const app: express.Application = express();
   app.use(morgan('tiny'));
-  app.use(loggerMiddleware());
+  app.use(contextMiddleware());
   app.set('view engine', 'pug');
   app.use(express.static('./public'));
   app.set('views', './views');
@@ -75,7 +78,6 @@ export async function main() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(await dbMiddleware());
 
   const router = Router();
   router.get('/', pugHandler.index);

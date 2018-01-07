@@ -4,7 +4,7 @@ import * as uuid from 'uuid';
 
 import * as authHandler from '../auth_handler';
 import { fail } from 'assert';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../lib/logger';
 
 describe(`AuthHandler`, () => {
   let res: any;

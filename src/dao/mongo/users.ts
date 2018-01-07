@@ -2,21 +2,31 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import * as MongoDB from 'mongodb';
 
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../lib/logger';
 import BaseDAO, { BaseModel } from './base';
 
-export interface User extends UserCreateOptions, BaseModel {}
+export interface User extends UserCreateOptions, BaseModel {
+  lastActivitiesSyncedAt: Date;
+}
 
 export interface UserCreateOptions {
   displayName: string;
   provider: string;
   accessToken: string;
   providerId: string;
-  lastActivitiesSyncedAt: number;
+  lastActivitiesSyncedAt?: Date;
 }
 
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   protected readonly collectionName: string = 'users';
+
+  public async create(createOptions: UserCreateOptions): Promise<User> {
+    if (!createOptions.lastActivitiesSyncedAt) {
+      createOptions.lastActivitiesSyncedAt = new Date(0);
+    }
+
+    return super.create(createOptions);
+  }
 
   public async findUsers(
     userIdentifiers: {
