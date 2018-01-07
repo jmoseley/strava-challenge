@@ -9,10 +9,15 @@ export interface ProviderUser {
 
 export interface ProviderActivity extends ActivityCreateOptions {}
 
+export interface AuthenticatedUser {
+  userId: string;
+}
+
 export interface BaseProviderDAO<
+  AuthUser extends AuthenticatedUser,
   User extends ProviderUser,
   Activity extends ProviderActivity
 > {
-  getFriends(): Promise<User[]>;
-  getActivities(afterDate: Date): Promise<Activity[]>;
+  getFriends(user: AuthUser): Promise<User[]>;
+  getActivities(user: AuthUser, afterDate: Date): Promise<Activity[]>;
 }

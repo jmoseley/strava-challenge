@@ -5,6 +5,7 @@ import {
   BaseProviderDAO,
   ProviderActivity,
   ProviderUser,
+  AuthenticatedUser,
 } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
@@ -13,6 +14,7 @@ export class FriendService extends WithLog {
     loggerFactory: LoggerFactory,
     protected readonly userDAO: UserMongoDAO,
     protected readonly providerDAO: BaseProviderDAO<
+      AuthenticatedUser,
       ProviderUser,
       ProviderActivity
     >,

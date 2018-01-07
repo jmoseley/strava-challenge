@@ -10,15 +10,13 @@ import StravaProviderDAO from './providers/strava';
 
 const LOG = getLogger('lib/db');
 
-interface ProvidersList {
-  strava: StravaProviderDAO;
-}
-
 export interface DaoRequestContext {
   daos: {
     user: UserMongoDAO;
     activity: ActivityMongoDAO;
-    providers?: ProvidersList;
+    providers: {
+      strava: StravaProviderDAO;
+    };
   };
 }
 
@@ -29,23 +27,14 @@ export async function getRequestContextGenerator() {
   const db = dbClient.db(mongodbConfig.dbName);
   LOG.info(`Successfully connected to database.`);
 
-  return (loggerFactory: LoggerFactory, user?: User): DaoRequestContext => {
-    let providers: ProvidersList | undefined = undefined;
-    if (user) {
-      providers = {
-        strava: new StravaProviderDAO(
-          user.providerId,
-          user.accessToken,
-          loggerFactory,
-        ),
-      };
-    }
-
+  return (loggerFactory: LoggerFactory): DaoRequestContext => {
     return {
       daos: {
         user: new UserMongoDAO(loggerFactory, db),
         activity: new ActivityMongoDAO(loggerFactory, db),
-        providers,
+        providers: {
+          strava: new StravaProviderDAO(loggerFactory),
+        },
       },
     };
   };

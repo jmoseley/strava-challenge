@@ -12,42 +12,49 @@ const listFriends = util.promisify(strava.athlete.listFriends);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
 export interface StravaUser extends ProviderUser {}
-export interface StravaActivity extends ProviderActivity {}
-export default class StravaProviderDAO extends WithLog
-  implements BaseProviderDAO<StravaUser, StravaActivity> {
-  constructor(
-    private readonly userId: string,
-    private readonly accessToken: string,
-    loggerFactory: LoggerFactory,
-  ) {
-    super(loggerFactory);
-  }
+export interface AuthenticatedStravaUser extends StravaUser {
+  userId: string;
+  accessToken: string;
+}
 
-  public async getActivities(afterDate?: Date): Promise<StravaActivity[]> {
+export interface StravaActivity extends ProviderActivity {}
+
+export default class StravaProviderDAO extends WithLog
+  implements BaseProviderDAO<
+      AuthenticatedStravaUser,
+      StravaUser,
+      StravaActivity
+    > {
+  public async getActivities(
+    user: AuthenticatedStravaUser,
+    afterDate?: Date,
+  ): Promise<StravaActivity[]> {
     const afterSeconds = !isNullOrUndefined(afterDate)
       ? afterDate.getTime() / 1000
       : null;
 
     // TODO: Deal with pagination
     const rawActivities: RawStravaActivity[] = await listActivities({
-      access_token: this.accessToken,
+      access_token: user.accessToken,
       after: afterSeconds,
     });
 
     this.log.debug(
       `Found ${rawActivities.length} new activities from strava for user ${
-        this.userId
+        user.providerId
       }.`,
     );
 
     return _.map(rawActivities, activity => {
-      return this.convertActivity(activity);
+      return this.convertActivity(user, activity);
     });
   }
 
-  public async getFriends(): Promise<StravaUser[]> {
+  public async getFriends(
+    user: AuthenticatedStravaUser,
+  ): Promise<StravaUser[]> {
     const rawFriends: RawStravaUser[] = await listFriends({
-      access_token: this.accessToken,
+      access_token: user.accessToken,
     });
 
     return _.map(rawFriends, this.convertUser);
@@ -70,9 +77,12 @@ export default class StravaProviderDAO extends WithLog
     };
   }
 
-  private convertActivity(rawActivity: RawStravaActivity): StravaActivity {
+  private convertActivity(
+    sourceUser: AuthenticatedStravaUser,
+    rawActivity: RawStravaActivity,
+  ): StravaActivity {
     return {
-      userId: this.userId,
+      userId: sourceUser.userId,
       name: rawActivity.name,
       type: rawActivity.type,
       startDate: new Date(rawActivity.start_date),
