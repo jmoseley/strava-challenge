@@ -42,7 +42,7 @@ export const callback = requestHandler(
         log.info(`Creating user for oauth`, {
           user: _.omit(createOptions, ['accessToken']),
         });
-        user = await context.daos.user.create(createOptions);
+        user = await context.daos.user.createUserWithStrava(createOptions);
       }
       session.user = user;
 

@@ -11,19 +11,36 @@ export interface User extends UserCreateOptions, BaseModel {
 
 export interface UserCreateOptions {
   displayName: string;
-  provider: string;
+  // Eventually these schemas should be owned by the providers.
+  providers: {
+    strava: {
+      accessToken: string;
+      providerId: string;
+    };
+  };
+}
+
+export interface StravaUserCreateOptions {
+  displayName: string;
   accessToken: string;
   providerId: string;
-  lastActivitiesSyncedAt?: Date;
 }
 
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   protected readonly collectionName: string = 'users';
 
-  public async create(createOptions: UserCreateOptions): Promise<User> {
-    if (!createOptions.lastActivitiesSyncedAt) {
-      createOptions.lastActivitiesSyncedAt = new Date(0);
-    }
+  public async createUserWithStrava(
+    stravaCreateOptions: StravaUserCreateOptions,
+  ): Promise<User> {
+    const createOptions: UserCreateOptions = {
+      displayName: stravaCreateOptions.displayName,
+      providers: {
+        strava: {
+          accessToken: stravaCreateOptions.accessToken,
+          providerId: stravaCreateOptions.providerId,
+        },
+      },
+    };
 
     return super.create(createOptions);
   }
@@ -38,14 +55,17 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
       _.reduce(
         userIdentifiers,
         (query, uid) => {
-          query.provider.$in.push(uid.provider);
-          query.providerId.$in.push(uid.providerId);
+          if (!query.providers[uid.provider]) {
+            query.providers[uid.provider] = {
+              providerId: { $in: [] as string[] },
+            };
+          }
+          query.providers[uid.provider].providerId.$in.push(uid.providerId);
 
           return query;
         },
         {
-          provider: { $in: [] as string[] },
-          providerId: { $in: [] as string[] },
+          providers: {} as { [key: string]: { providerId: { $in: string[] } } },
         },
       ),
     );

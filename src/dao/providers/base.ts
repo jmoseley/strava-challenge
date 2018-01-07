@@ -18,4 +18,5 @@ export interface BaseProviderDAO<
 > {
   getFriends(user: User): Promise<PUser[]>;
   getActivities(user: User, afterDate: Date): Promise<PActivity[]>;
+  getProviderId(user: User): string;
 }

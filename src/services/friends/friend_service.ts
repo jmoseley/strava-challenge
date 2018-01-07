@@ -41,10 +41,11 @@ export class FriendService extends WithLog {
       })),
     );
 
-    return _.partition(providerFriends, stravaFriend => {
+    const providerId = this.providerDAO.getProviderId(user);
+    return _.partition(providerFriends, providerFriend => {
       return !!_.find(
         friendUsers,
-        friendUser => stravaFriend.providerId === friendUser.providerId,
+        friendUser => providerFriend.providerId === providerId,
       );
     });
   }

@@ -22,19 +22,21 @@ export default class StravaProviderDAO extends WithLog
     user: User,
     afterDate?: Date,
   ): Promise<StravaActivity[]> {
+    const authData = this.getAuthData(user);
+
     const afterSeconds = !isNullOrUndefined(afterDate)
       ? afterDate.getTime() / 1000
       : null;
 
     // TODO: Deal with pagination
     const rawActivities: RawStravaActivity[] = await listActivities({
-      access_token: user.accessToken,
+      access_token: authData.accessToken,
       after: afterSeconds,
     });
 
     this.log.debug(
       `Found ${rawActivities.length} new activities from strava for user ${
-        user.providerId
+        authData.providerId
       }.`,
     );
 
@@ -44,11 +46,24 @@ export default class StravaProviderDAO extends WithLog
   }
 
   public async getFriends(user: User): Promise<StravaUser[]> {
+    const authData = this.getAuthData(user);
+
     const rawFriends: RawStravaUser[] = await listFriends({
-      access_token: user.accessToken,
+      access_token: authData.accessToken,
     });
 
     return _.map(rawFriends, this.convertUser);
+  }
+
+  public getProviderId(user: User): string {
+    return user.providers.strava.providerId;
+  }
+
+  private getAuthData(user: User): { accessToken: string; providerId: string } {
+    return {
+      accessToken: user.providers.strava.accessToken,
+      providerId: user.providers.strava.providerId,
+    };
   }
 
   private convertUser(rawUser: RawStravaUser): StravaUser {
