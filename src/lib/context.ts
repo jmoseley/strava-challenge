@@ -11,10 +11,16 @@ import {
   DaoRequestContext,
   getRequestContextGenerator as getDAORequestContextGenerator,
 } from '../dao/context';
+import {
+  ServiceRequestContext,
+  getRequestContext as serviceContextGenerator,
+} from '../services/context';
+import StravaProviderDAO from '../dao/providers/strava';
 
 export interface RequestContext
   extends LoggerRequestContext,
-    DaoRequestContext {
+    DaoRequestContext,
+    ServiceRequestContext {
   traceId: string;
 }
 
@@ -41,10 +47,21 @@ export async function getContextGeneratorMiddleware() {
         const traceId = req.get('x-trace-id') || shortUUIDFormat.new();
         const loggerContext = loggerContextGenerator(traceId);
         const daoContext = daoContextGenerator(loggerContext.loggerFactory);
+        // This got really messy. We need to clean up the patterns around providers. I will do that in a later
+        // PR.
+        const serviceContext = serviceContextGenerator(
+          loggerContext.loggerFactory,
+          daoContext.daos.user,
+          daoContext.daos.activity,
+          _.get(daoContext, 'daos.providers.strava') as
+            | StravaProviderDAO
+            | undefined,
+        );
 
         const context: RequestContext = {
           ...loggerContext,
           ...daoContext,
+          ...serviceContext,
           traceId,
         };
 

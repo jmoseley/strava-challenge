@@ -38,9 +38,9 @@ export const friends = requestHandler(
       context.loggerFactory,
     );
     const friendService = new FriendService(
+      context.loggerFactory,
       context.daos.user,
       stravaProvider,
-      log,
     );
 
     const [
@@ -72,10 +72,10 @@ export const activities = requestHandler(
       context.loggerFactory,
     );
     const activityService = new ActivityService(
+      context.loggerFactory,
       context.daos.user,
       context.daos.activity,
       stravaProvider,
-      log,
     );
 
     await activityService.syncActivities(session.user.id);
