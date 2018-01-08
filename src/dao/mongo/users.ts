@@ -7,6 +7,7 @@ import BaseDAO, { BaseModel } from './base';
 
 export interface User extends UserCreateOptions, BaseModel {
   lastActivitiesSyncedAt: Date;
+  friendIds: string[];
 }
 
 export interface UserCreateOptions {
@@ -15,6 +16,7 @@ export interface UserCreateOptions {
   accessToken: string;
   providerId: string;
   lastActivitiesSyncedAt?: Date;
+  friendIds?: string[];
 }
 
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
@@ -23,6 +25,9 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   public async create(createOptions: UserCreateOptions): Promise<User> {
     if (!createOptions.lastActivitiesSyncedAt) {
       createOptions.lastActivitiesSyncedAt = new Date(0);
+    }
+    if (!createOptions.friendIds) {
+      createOptions.friendIds = [];
     }
 
     return super.create(createOptions);
