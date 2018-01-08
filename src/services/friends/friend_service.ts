@@ -10,6 +10,7 @@ import { LoggerFactory, WithLog } from '../../lib/logger';
 
 export interface PotentialFriendUser extends User {
   requested: boolean;
+  sent: boolean;
 }
 
 export class FriendService extends WithLog {
@@ -50,7 +51,8 @@ export class FriendService extends WithLog {
     const [friends, potentialFriendUsers] = _.partition(
       friendUsers,
       pfu =>
-        !!_.find(pfu.friendIds, user.id) && !!_.find(user.friendIds, pfu.id),
+        !!_.find(pfu.friendIds, id => id === user.id) &&
+        !!_.find(user.friendIds, id => id === pfu.id),
     );
 
     const nonPotentialFriends = _.filter(
@@ -61,7 +63,8 @@ export class FriendService extends WithLog {
     const potentialFriends = _.map(potentialFriendUsers, pfu => {
       return {
         ...pfu,
-        requested: !!_.find(pfu.friendIds, user.id),
+        requested: !!_.find(pfu.friendIds, id => id === user.id),
+        sent: !!_.find(user.friendIds, id => id === pfu.id),
       };
     });
 

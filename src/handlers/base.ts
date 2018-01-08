@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 import { RequestContext, ContextedRequest } from '../lib/context';
+import { User } from '../dao/mongo/users';
 
 export interface RequestHandlerResult {
   template?: {

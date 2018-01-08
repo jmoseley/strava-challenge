@@ -61,11 +61,19 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   }
 
   public async addFriend(id: string, friendId: string): Promise<User> {
+    this.log.debug(`Adding friend (${friendId}) to user ${id}`);
+
+    const friendUser = await this.findById(friendId);
+    if (!friendUser) {
+      // TODO: 404
+      throw new Error(`Cannot add friend that does not exist.`);
+    }
+
     const result = await this.collection().findOneAndUpdate(
       { id },
       {
         $currentDate: { updatedAt: true },
-        $push: { friends: friendId },
+        $addToSet: { friendIds: friendUser.id },
       },
     );
 

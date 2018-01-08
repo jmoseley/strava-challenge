@@ -16,11 +16,14 @@ block content
         br
         | #{val.displayName}
         br
-        a(href=`/friends/add/${val.id}`)
-          if val.requested
-            | Accept Request
-          else
-            | Send Friend Request
+        if val.sent
+          | Request Sent, awaiting response
+        else
+          a(href=`/friends/add/${val.id}`)
+            if val.requested
+              | Accept Request
+            else
+              | Send Friend Request
 
   if needInviteFriends.length
     h3 Invite a Friend

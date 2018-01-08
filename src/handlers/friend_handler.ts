@@ -12,14 +12,9 @@ export const addFriend = requestHandler(
     if (!pathParams.id) {
       throw new Error(`A userId must be specified.`);
     }
-    log.debug(`Adding friend for userId ${pathParams.id}`);
+    log.debug(`Adding friend with userId ${pathParams.id}`);
 
-    const friendUser = await context.daos.user.findById(pathParams.id);
-    if (!friendUser) {
-      // TODO: 404
-      throw new Error(`Cannot add friend that does not exist.`);
-    }
-    await context.daos.user.addFriend(session.user.id, friendUser.id);
+    await context.daos.user.addFriend(session.user.id, pathParams.id);
 
     return { redirect: '/friends' };
   },
