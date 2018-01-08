@@ -20,7 +20,9 @@ export class FriendService extends WithLog {
     super(loggerFactory);
   }
 
-  async getFriends(userId: string): Promise<[ProviderUser[], ProviderUser[]]> {
+  async getFriends(
+    userId: string,
+  ): Promise<[User[], ProviderUser[], ProviderUser[]]> {
     let user = await this.userDAO.findById(userId);
     if (!user) {
       // TODO: 404
@@ -34,18 +36,34 @@ export class FriendService extends WithLog {
     // TODO: Eventually we should just create a user object for all these users that we find.
 
     // Look up all the friends in one query.
-    const friendUsers = await this.userDAO.findUsers(
+    const potentialFriendUsers = await this.userDAO.findUsers(
       _.map(providerFriends, f => ({
         provider: f.provider,
         providerId: f.providerId,
       })),
     );
 
-    return _.partition(providerFriends, stravaFriend => {
-      return !!_.find(
-        friendUsers,
-        friendUser => stravaFriend.providerId === friendUser.providerId,
-      );
-    });
+    const friends = _.filter(
+      potentialFriendUsers,
+      pfu =>
+        !!_.find(pfu.friendIds, user.id) && !!_.find(user.friendIds, pfu.id),
+    );
+
+    const [unfilteredPotentialFriends, nonPotentialFriends] = _.partition(
+      providerFriends,
+      stravaFriend => {
+        return !!_.find(
+          potentialFriendUsers,
+          friendUser => stravaFriend.providerId === friendUser.providerId,
+        );
+      },
+    );
+
+    const potentialFriends = _.filter(
+      unfilteredPotentialFriends,
+      upf => !_.find(friends, f => f.providerId === upf.providerId),
+    );
+
+    return [friends, potentialFriends, nonPotentialFriends];
   }
 }

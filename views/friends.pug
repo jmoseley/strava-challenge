@@ -2,6 +2,12 @@ extends layout.pug
 
 block content
   h2 Friends
+  each val in friends
+    p
+      img(src=val.avatarUrl width=100)
+      br
+      | #{val.displayName}
+
   if potentialFriends.length
     h3 Add Friends
     each val in potentialFriends

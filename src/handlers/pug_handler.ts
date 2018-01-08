@@ -33,14 +33,12 @@ export const friends = requestHandler(
     const templateContext = getSharedTemplateContext(session, log);
 
     const [
+      friends,
       potentialFriends,
       needInviteFriends,
     ] = await context.services.friends.getFriends(session.user.id);
 
-    // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
-    // friendship automatically.
-
-    // TODO: Filter out people that are already friends.
+    templateContext.friends = friends;
     templateContext.potentialFriends = potentialFriends;
     templateContext.needInviteFriends = needInviteFriends;
 
