@@ -28,6 +28,7 @@ export const callback = requestHandler(
         log.info(`Found existing user for oauth`, { user });
         user = await context.daos.user.updateAccessToken(
           user.id,
+          userFromSession.provider,
           userFromSession.token,
         );
         log.debug(`Finished updating user access token`);
@@ -42,7 +43,7 @@ export const callback = requestHandler(
         log.info(`Creating user for oauth`, {
           user: _.omit(createOptions, ['accessToken']),
         });
-        user = await context.daos.user.create(createOptions);
+        user = await context.daos.user.createUserWithStrava(createOptions);
       }
       session.user = user;
 

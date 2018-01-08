@@ -20,7 +20,7 @@ describe(`AuthHandler`, () => {
           user: {
             findUsers: jest.fn(),
             updateAccessToken: jest.fn(),
-            create: jest.fn(),
+            createUserWithStrava: jest.fn(),
           },
         },
       },
@@ -75,13 +75,13 @@ describe(`AuthHandler`, () => {
       describe(`without an existing user`, () => {
         beforeEach(async () => {
           req.context.daos.user.findUsers.mockReturnValue([]);
-          req.context.daos.user.create.mockReturnValue(user);
+          req.context.daos.user.createUserWithStrava.mockReturnValue(user);
 
           await authHandler.callback(req, res, next);
         });
 
         it(`creates the user`, async () => {
-          expect(req.context.daos.user.create).toBeCalledWith(
+          expect(req.context.daos.user.createUserWithStrava).toBeCalledWith(
             _.omit(user, ['id']),
           );
         });
@@ -115,6 +115,7 @@ describe(`AuthHandler`, () => {
         it(`updates the accessToken`, () => {
           expect(req.context.daos.user.updateAccessToken).toBeCalledWith(
             user.id,
+            'strava',
             '123456',
           );
         });
@@ -124,7 +125,7 @@ describe(`AuthHandler`, () => {
         });
 
         it(`does not create the user`, () => {
-          expect(req.context.daos.user.create).not.toBeCalled();
+          expect(req.context.daos.user.createUserWithStrava).not.toBeCalled();
         });
 
         it(`tries to find the user`, () => {

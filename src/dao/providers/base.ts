@@ -12,10 +12,7 @@ export interface ProviderActivity extends ActivityCreateOptions {}
 
 // I'm on the fence about the providers needing to know how to get auth information from the user model, but
 // it needs to live somewhere :(
-export interface BaseProviderDAO<
-  PUser extends ProviderUser,
-  PActivity extends ProviderActivity
-> {
-  getFriends(user: User): Promise<PUser[]>;
-  getActivities(user: User, afterDate: Date): Promise<PActivity[]>;
+export interface BaseProviderDAO {
+  getFriends(user: User): Promise<ProviderUser[]>;
+  getActivities(user: User, afterDate: Date): Promise<ProviderActivity[]>;
 }

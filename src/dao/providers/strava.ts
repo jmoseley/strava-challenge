@@ -12,29 +12,27 @@ const strava = require('strava-v3');
 const listFriends = util.promisify(strava.athlete.listFriends);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
-export interface StravaUser extends ProviderUser {}
-
-export interface StravaActivity extends ProviderActivity {}
-
 export default class StravaProviderDAO extends WithLog
-  implements BaseProviderDAO<StravaUser, StravaActivity> {
+  implements BaseProviderDAO {
   public async getActivities(
     user: User,
     afterDate?: Date,
-  ): Promise<StravaActivity[]> {
+  ): Promise<ProviderActivity[]> {
+    const authData = this.getAuthData(user);
+
     const afterSeconds = !isNullOrUndefined(afterDate)
       ? afterDate.getTime() / 1000
       : null;
 
     // TODO: Deal with pagination
     const rawActivities: RawStravaActivity[] = await listActivities({
-      access_token: user.accessToken,
+      access_token: authData.accessToken,
       after: afterSeconds,
     });
 
     this.log.debug(
       `Found ${rawActivities.length} new activities from strava for user ${
-        user.providerId
+        authData.providerId
       }.`,
     );
 
@@ -43,15 +41,24 @@ export default class StravaProviderDAO extends WithLog
     });
   }
 
-  public async getFriends(user: User): Promise<StravaUser[]> {
+  public async getFriends(user: User): Promise<ProviderUser[]> {
+    const authData = this.getAuthData(user);
+
     const rawFriends: RawStravaUser[] = await listFriends({
-      access_token: user.accessToken,
+      access_token: authData.accessToken,
     });
 
     return _.map(rawFriends, this.convertUser);
   }
 
-  private convertUser(rawUser: RawStravaUser): StravaUser {
+  private getAuthData(user: User): { accessToken: string; providerId: string } {
+    return {
+      accessToken: user.providers.strava.accessToken,
+      providerId: user.providers.strava.providerId,
+    };
+  }
+
+  private convertUser(rawUser: RawStravaUser): ProviderUser {
     // Handles default profile images that look like 'avatar/athlete/large.png' or 'avatar/athlete/medium.png'
     if (rawUser.profile) {
       const profileUrl = URL(rawUser.profile);
@@ -71,7 +78,7 @@ export default class StravaProviderDAO extends WithLog
   private convertActivity(
     sourceUser: User,
     rawActivity: RawStravaActivity,
-  ): StravaActivity {
+  ): ProviderActivity {
     return {
       userId: sourceUser.id,
       name: rawActivity.name,
