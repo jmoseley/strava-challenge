@@ -29,6 +29,7 @@ export const friends = requestHandler(
   true,
   async (context: RequestContext, session: Express.Session) => {
     const log = getLogger('friends', context);
+    log.debug(`finding friends`);
     const templateContext = getSharedTemplateContext(session, log);
 
     const [
@@ -76,7 +77,10 @@ function getSharedTemplateContext(
 ): any {
   const user = _.get(session, 'user');
   if (user) {
-    log.debug(`Found user in session.`, { displayName: user.displayName });
+    log.debug(`Found user in session.`, {
+      displayName: user.displayName,
+      providerId: user.providerId,
+    });
   }
 
   return { user };

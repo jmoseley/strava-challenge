@@ -34,21 +34,23 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
       providerId: string;
     }[],
   ): Promise<User[]> {
-    const result = await this.collection().find(
-      _.reduce(
-        userIdentifiers,
-        (query, uid) => {
-          query.provider.$in.push(uid.provider);
-          query.providerId.$in.push(uid.providerId);
+    const query = _.reduce(
+      userIdentifiers,
+      (query, uid) => {
+        query.provider.$in.push(uid.provider);
+        query.providerId.$in.push(uid.providerId);
 
-          return query;
-        },
-        {
-          provider: { $in: [] as string[] },
-          providerId: { $in: [] as string[] },
-        },
-      ),
+        query.provider.$in = _.uniq(query.provider.$in);
+
+        return query;
+      },
+      {
+        provider: { $in: [] as string[] },
+        providerId: { $in: [] as string[] },
+      },
     );
+
+    const result = await this.collection().find(query);
 
     return await result.toArray();
   }

@@ -24,6 +24,7 @@ export function requestHandler(
     next: express.NextFunction,
   ) => {
     const log = req.context.loggerFactory.getLogger('RequestHandler');
+    log.debug(`Handling '${req.path}'`);
 
     let session: Express.Session = {} as any;
     session = _.get(req, 'session') as Express.Session;

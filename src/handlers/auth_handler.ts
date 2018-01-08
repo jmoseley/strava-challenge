@@ -18,7 +18,7 @@ export const callback = requestHandler(
       let users: User[] = await context.daos.user.findUsers([
         {
           provider: userFromSession.provider,
-          providerId: userFromSession.id,
+          providerId: userFromSession.id.toString(),
         },
       ]);
       let user: User;
@@ -37,7 +37,7 @@ export const callback = requestHandler(
           displayName: userFromSession.displayName,
           accessToken: userFromSession.token,
           provider: userFromSession.provider,
-          providerId: userFromSession.id,
+          providerId: userFromSession.id.toString(),
         };
         log.info(`Creating user for oauth`, {
           user: _.omit(createOptions, ['accessToken']),
