@@ -11,6 +11,7 @@ import { Server } from 'net';
 
 import * as pugHandler from './handlers/pug_handler';
 import * as authHandler from './handlers/auth_handler';
+import * as friendHandler from './handlers/friend_handler';
 import { config } from './config';
 import { getLogger } from './lib/logger';
 import { getSessionStore } from './lib/session_store';
@@ -82,6 +83,7 @@ export async function main() {
   const router = Router();
   router.get('/', pugHandler.index);
   router.get('/friends', pugHandler.friends);
+  router.get('/friends/add/:id', friendHandler.addFriend);
   router.get('/activities', pugHandler.activities);
 
   router.get(

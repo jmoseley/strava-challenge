@@ -12,6 +12,7 @@ export interface RequestHandlerResult {
 export type RequestHandler = (
   context: RequestContext,
   session: Express.Session,
+  pathParams?: any,
 ) => Promise<RequestHandlerResult>;
 
 export function requestHandler(
@@ -32,7 +33,7 @@ export function requestHandler(
       throw new Error(`Not authenticated`);
     }
 
-    const result = await handler(req.context, session);
+    const result = await handler(req.context, session, req.params);
 
     if (!result) {
       throw new Error('unexpected undefined result');
