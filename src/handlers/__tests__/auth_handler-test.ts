@@ -115,6 +115,7 @@ describe(`AuthHandler`, () => {
         it(`updates the accessToken`, () => {
           expect(req.context.daos.user.updateAccessToken).toBeCalledWith(
             user.id,
+            'strava',
             '123456',
           );
         });

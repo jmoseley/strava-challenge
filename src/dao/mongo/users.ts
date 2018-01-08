@@ -79,12 +79,16 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
 
   public async updateAccessToken(
     id: string,
+    provider: string,
     accessToken: string,
   ): Promise<User> {
     const result = await this.collection().findOneAndUpdate(
       { id },
       {
-        $set: { accessToken, updatedAt: new Date() },
+        $set: {
+          providers: { [provider]: { accessToken } },
+          updatedAt: new Date(),
+        },
       },
     );
 

@@ -28,6 +28,7 @@ export const callback = requestHandler(
         log.info(`Found existing user for oauth`, { user });
         user = await context.daos.user.updateAccessToken(
           user.id,
+          userFromSession.provider,
           userFromSession.token,
         );
         log.debug(`Finished updating user access token`);
