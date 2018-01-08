@@ -19,12 +19,6 @@ export const index = requestHandler(
   },
 );
 
-// Data layout for friends:
-// Friend Request:
-// sourceUseId, targetUserId
-// When request is accepted, we create a friendship, and delete the request
-// Frienship:
-// user1Id, user2Id
 export const friends = requestHandler(
   true,
   async (context: RequestContext, session: Express.Session) => {

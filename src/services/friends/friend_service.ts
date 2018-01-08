@@ -8,6 +8,10 @@ import {
 } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
+export interface PotentialFriendUser extends User {
+  requested: boolean;
+}
+
 export class FriendService extends WithLog {
   constructor(
     loggerFactory: LoggerFactory,
@@ -22,7 +26,7 @@ export class FriendService extends WithLog {
 
   async getFriends(
     userId: string,
-  ): Promise<[User[], ProviderUser[], ProviderUser[]]> {
+  ): Promise<[User[], PotentialFriendUser[], ProviderUser[]]> {
     let user = await this.userDAO.findById(userId);
     if (!user) {
       // TODO: 404
@@ -36,33 +40,30 @@ export class FriendService extends WithLog {
     // TODO: Eventually we should just create a user object for all these users that we find.
 
     // Look up all the friends in one query.
-    const potentialFriendUsers = await this.userDAO.findUsers(
+    const friendUsers = await this.userDAO.findUsers(
       _.map(providerFriends, f => ({
         provider: f.provider,
         providerId: f.providerId,
       })),
     );
 
-    const friends = _.filter(
-      potentialFriendUsers,
+    const [friends, potentialFriendUsers] = _.partition(
+      friendUsers,
       pfu =>
         !!_.find(pfu.friendIds, user.id) && !!_.find(user.friendIds, pfu.id),
     );
 
-    const [unfilteredPotentialFriends, nonPotentialFriends] = _.partition(
+    const nonPotentialFriends = _.filter(
       providerFriends,
-      stravaFriend => {
-        return !!_.find(
-          potentialFriendUsers,
-          friendUser => stravaFriend.providerId === friendUser.providerId,
-        );
-      },
+      pf => !_.find(friendUsers, pfu => pfu.providerId === pf.providerId),
     );
 
-    const potentialFriends = _.filter(
-      unfilteredPotentialFriends,
-      upf => !_.find(friends, f => f.providerId === upf.providerId),
-    );
+    const potentialFriends = _.map(potentialFriendUsers, pfu => {
+      return {
+        ...pfu,
+        requested: !!_.find(pfu.friendIds, user.id),
+      };
+    });
 
     return [friends, potentialFriends, nonPotentialFriends];
   }
