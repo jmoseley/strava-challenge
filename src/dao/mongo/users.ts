@@ -60,6 +60,21 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
     return await result.toArray();
   }
 
+  public async addFriend(id: string, friendId: string): Promise<User> {
+    const result = await this.collection().findOneAndUpdate(
+      { id },
+      {
+        $currentDate: { updatedAt: true },
+        $push: { friends: friendId },
+      },
+    );
+
+    if (!result.value) {
+      throw new Error(`Cannot update user that does not exist.`);
+    }
+    return result.value;
+  }
+
   public async updateAccessToken(
     id: string,
     accessToken: string,
@@ -67,7 +82,8 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
     const result = await this.collection().findOneAndUpdate(
       { id },
       {
-        $set: { accessToken, updatedAt: new Date() },
+        $set: { accessToken },
+        $currentDate: { updatedAt: true },
       },
     );
 
