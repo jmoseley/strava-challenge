@@ -2,8 +2,28 @@ extends layout.pug
 
 block content
   h2 Friends
+  each val in friends
+    p
+      img(src=val.avatarUrl width=100)
+      br
+      | #{val.displayName}
+
   if potentialFriends.length
     h3 Add Friends
+    each val in potentialFriends
+      p
+        img(src=val.avatarUrl width=100)
+        br
+        | #{val.displayName}
+        br
+        if val.sent
+          | Request Sent, awaiting response
+        else
+          a(href=`/friends/add/${val.id}`)
+            if val.requested
+              | Accept Request
+            else
+              | Send Friend Request
 
   if needInviteFriends.length
     h3 Invite a Friend

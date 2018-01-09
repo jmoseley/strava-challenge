@@ -7,6 +7,7 @@ import BaseDAO, { BaseModel } from './base';
 
 export interface User extends UserCreateOptions, BaseModel {
   lastActivitiesSyncedAt: Date;
+  friendIds: string[];
 }
 
 export interface UserCreateOptions {
@@ -15,6 +16,7 @@ export interface UserCreateOptions {
   accessToken: string;
   providerId: string;
   lastActivitiesSyncedAt?: Date;
+  friendIds?: string[];
 }
 
 export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
@@ -23,6 +25,9 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
   public async create(createOptions: UserCreateOptions): Promise<User> {
     if (!createOptions.lastActivitiesSyncedAt) {
       createOptions.lastActivitiesSyncedAt = new Date(0);
+    }
+    if (!createOptions.friendIds) {
+      createOptions.friendIds = [];
     }
 
     return super.create(createOptions);
@@ -34,23 +39,48 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
       providerId: string;
     }[],
   ): Promise<User[]> {
-    const result = await this.collection().find(
-      _.reduce(
-        userIdentifiers,
-        (query, uid) => {
-          query.provider.$in.push(uid.provider);
-          query.providerId.$in.push(uid.providerId);
+    const query = _.reduce(
+      userIdentifiers,
+      (query, uid) => {
+        query.provider.$in.push(uid.provider);
+        query.providerId.$in.push(uid.providerId);
 
-          return query;
-        },
-        {
-          provider: { $in: [] as string[] },
-          providerId: { $in: [] as string[] },
-        },
-      ),
+        query.provider.$in = _.uniq(query.provider.$in);
+
+        return query;
+      },
+      {
+        provider: { $in: [] as string[] },
+        providerId: { $in: [] as string[] },
+      },
     );
 
+    const result = await this.collection().find(query);
+
     return await result.toArray();
+  }
+
+  public async addFriend(id: string, friendId: string): Promise<User> {
+    this.log.debug(`Adding friend (${friendId}) to user ${id}`);
+
+    const friendUser = await this.findById(friendId);
+    if (!friendUser) {
+      // TODO: 404
+      throw new Error(`Cannot add friend that does not exist.`);
+    }
+
+    const result = await this.collection().findOneAndUpdate(
+      { id },
+      {
+        $currentDate: { updatedAt: true },
+        $addToSet: { friendIds: friendUser.id },
+      },
+    );
+
+    if (!result.value) {
+      throw new Error(`Cannot update user that does not exist.`);
+    }
+    return result.value;
   }
 
   public async updateAccessToken(
@@ -60,7 +90,8 @@ export default class UserMongoDAO extends BaseDAO<User, UserCreateOptions> {
     const result = await this.collection().findOneAndUpdate(
       { id },
       {
-        $set: { accessToken, updatedAt: new Date() },
+        $set: { accessToken },
+        $currentDate: { updatedAt: true },
       },
     );
 

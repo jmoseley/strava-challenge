@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as express from 'express';
 import { RequestContext, ContextedRequest } from '../lib/context';
+import { User } from '../dao/mongo/users';
 
 export interface RequestHandlerResult {
   template?: {
@@ -12,6 +13,7 @@ export interface RequestHandlerResult {
 export type RequestHandler = (
   context: RequestContext,
   session: Express.Session,
+  pathParams?: any,
 ) => Promise<RequestHandlerResult>;
 
 export function requestHandler(
@@ -24,6 +26,7 @@ export function requestHandler(
     next: express.NextFunction,
   ) => {
     const log = req.context.loggerFactory.getLogger('RequestHandler');
+    log.debug(`Handling '${req.path}'`);
 
     let session: Express.Session = {} as any;
     session = _.get(req, 'session') as Express.Session;
@@ -31,7 +34,7 @@ export function requestHandler(
       throw new Error(`Not authenticated`);
     }
 
-    const result = await handler(req.context, session);
+    const result = await handler(req.context, session, req.params);
 
     if (!result) {
       throw new Error('unexpected undefined result');

@@ -8,6 +8,11 @@ import {
 } from '../../dao/providers/base';
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
+export interface PotentialFriendUser extends User {
+  requested: boolean;
+  sent: boolean;
+}
+
 export class FriendService extends WithLog {
   constructor(
     loggerFactory: LoggerFactory,
@@ -20,7 +25,9 @@ export class FriendService extends WithLog {
     super(loggerFactory);
   }
 
-  async getFriends(userId: string): Promise<[ProviderUser[], ProviderUser[]]> {
+  async getFriends(
+    userId: string,
+  ): Promise<[User[], PotentialFriendUser[], ProviderUser[]]> {
     let user = await this.userDAO.findById(userId);
     if (!user) {
       // TODO: 404
@@ -41,11 +48,26 @@ export class FriendService extends WithLog {
       })),
     );
 
-    return _.partition(providerFriends, stravaFriend => {
-      return !!_.find(
-        friendUsers,
-        friendUser => stravaFriend.providerId === friendUser.providerId,
-      );
+    const [friends, potentialFriendUsers] = _.partition(
+      friendUsers,
+      pfu =>
+        !!_.find(pfu.friendIds, id => id === user.id) &&
+        !!_.find(user.friendIds, id => id === pfu.id),
+    );
+
+    const nonPotentialFriends = _.filter(
+      providerFriends,
+      pf => !_.find(friendUsers, pfu => pfu.providerId === pf.providerId),
+    );
+
+    const potentialFriends = _.map(potentialFriendUsers, pfu => {
+      return {
+        ...pfu,
+        requested: !!_.find(pfu.friendIds, id => id === user.id),
+        sent: !!_.find(user.friendIds, id => id === pfu.id),
+      };
     });
+
+    return [friends, potentialFriends, nonPotentialFriends];
   }
 }

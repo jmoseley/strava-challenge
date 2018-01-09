@@ -44,6 +44,7 @@ export default class StravaProviderDAO extends WithLog
   }
 
   public async getFriends(user: User): Promise<StravaUser[]> {
+    this.log.debug(`Getting friends for user ${user.id}`);
     const rawFriends: RawStravaUser[] = await listFriends({
       access_token: user.accessToken,
     });

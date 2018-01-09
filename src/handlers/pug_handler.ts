@@ -19,27 +19,20 @@ export const index = requestHandler(
   },
 );
 
-// Data layout for friends:
-// Friend Request:
-// sourceUseId, targetUserId
-// When request is accepted, we create a friendship, and delete the request
-// Frienship:
-// user1Id, user2Id
 export const friends = requestHandler(
   true,
   async (context: RequestContext, session: Express.Session) => {
     const log = getLogger('friends', context);
+    log.debug(`finding friends`);
     const templateContext = getSharedTemplateContext(session, log);
 
     const [
+      friends,
       potentialFriends,
       needInviteFriends,
     ] = await context.services.friends.getFriends(session.user.id);
 
-    // TODO: If there is bi-directional following and the user exists on the platform, we should just create the
-    // friendship automatically.
-
-    // TODO: Filter out people that are already friends.
+    templateContext.friends = friends;
     templateContext.potentialFriends = potentialFriends;
     templateContext.needInviteFriends = needInviteFriends;
 
@@ -76,7 +69,10 @@ function getSharedTemplateContext(
 ): any {
   const user = _.get(session, 'user');
   if (user) {
-    log.debug(`Found user in session.`, { displayName: user.displayName });
+    log.debug(`Found user in session.`, {
+      displayName: user.displayName,
+      providerId: user.providerId,
+    });
   }
 
   return { user };
