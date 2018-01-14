@@ -7,7 +7,10 @@
   "license": "MIT",
   "version": "1.0.0",
   "lint-staged": {
-    "*.{js,json,css,md}": ["prettier --write", "git add"]
+    "*.{js,json,css,md,ts,vue}": [
+      "prettier --single-quote --trailing-comma all --write",
+      "git add"
+    ]
   },
   "scripts": {
     "dev": "nuxt",
@@ -73,7 +76,7 @@
     "husky": "^0.14.3",
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
-    "prettier": "^1.9.2",
+    "prettier": "^1.10.2",
     "ts-loader": "^2.3.0",
     "typescript": "^2.4.1"
   }

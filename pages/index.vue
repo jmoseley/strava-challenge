@@ -14,19 +14,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "nuxt-class-component"
-import Card from "~/components/Card.vue"
-import { State, Getter } from "vuex-class"
+import Vue from 'vue';
+import Component from 'nuxt-class-component';
+import Card from '~/components/Card.vue';
+import { State, Getter } from 'vuex-class';
 
 @Component({
   components: {
-    Card
-  }
+    Card,
+  },
 })
 export default class extends Vue {
-  @State selected
-  @State people
-  @Getter selectedPerson
+  @State selected;
+  @State people;
+  @Getter selectedPerson;
 }
 </script>
