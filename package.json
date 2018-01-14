@@ -1,56 +1,29 @@
 {
   "name": "strava-challenge",
-  "version": "1.0.0",
-  "description":
-    "Allow users to create private challenges and share them with their friends.",
-  "main": "dist/start.js",
-  "scripts": {
-    "dev": "./scripts/dev.sh",
-    "clean": "./scripts/clean.sh",
-    "start": "./scripts/start.sh",
-    "test": "./scripts/test.sh",
-    "compile": "./scripts/compile.sh",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,json,css,md,ts}": [
-      "prettier --single-quote --trailing-comma all --write",
-      "git add"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jmoseley/strava-challenge.git"
   },
-  "keywords": ["strava", "training", "exercise"],
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "src/(.*/)*(__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
-  },
-  "author": "Jeremy Moseley",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jmoseley/strava-challenge/issues"
+  "version": "1.0.0",
+  "lint-staged": {
+    "*.{js,json,css,md}": ["prettier --write", "git add"]
   },
-  "homepage": "https://github.com/jmoseley/strava-challenge#readme",
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "precommit": "lint-staged"
+  },
+  "config": {
+    "nuxt": {
+      "host": "0.0.0.0",
+      "port": "8765"
+    }
+  },
   "dependencies": {
-    "@types/convict": "^4.1.1",
-    "@types/cookie-parser": "^1.4.1",
-    "@types/express": "^4.11.0",
-    "@types/express-promise-router": "^2.0.0",
-    "@types/express-session": "^1.15.6",
-    "@types/lodash": "^4.14.91",
-    "@types/mongodb": "^2.2.18",
-    "@types/morgan": "^1.7.35",
-    "@types/passport": "^0.4.2",
-    "@types/pug": "^2.0.4",
-    "@types/source-map-support": "^0.4.0",
-    "@types/url-parse": "^1.1.0",
-    "@types/uuid": "^3.4.3",
-    "@types/winston": "^2.3.7",
+    "axios": "^0.16.2",
     "connect-mongodb-session": "^1.4.0",
     "convict": "^4.0.2",
     "cookie-parser": "^1.4.3",
@@ -58,26 +31,50 @@
     "express-mongodb": "0.0.4",
     "express-promise-router": "^2.0.0",
     "express-session": "^1.15.6",
+    "gsap": "^1.20.2",
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
+    "nuxt": "^1.1.1",
+    "nuxt-class-component": "^1.0.1",
     "passport": "^0.4.0",
     "passport-strava-oauth2": "^0.1.3",
     "pug": "^2.0.0-rc.4",
     "short-uuid": "^2.3.4",
     "source-map-support": "^0.5.0",
     "strava-v3": "^1.14.0",
-    "typescript": "^2.6.2",
+    "tachyons": "^4.7.4",
     "url-parse": "^1.2.0",
     "uuid": "^3.1.0",
+    "vue": "^2.5.13",
+    "vue-class-component": "^6.1.2",
+    "vue-loader": "^13.7.0",
+    "vue-property-decorator": "^6.0.0",
+    "vuex": "^3.0.1",
+    "vuex-class": "^0.3.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "@types/convict": "^4.1.1",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.11.0",
+    "@types/express-promise-router": "^2.0.0",
+    "@types/express-session": "^1.15.6",
     "@types/jest": "^22.0.0",
-    "forever": "^0.15.3",
+    "@types/lodash": "^4.14.91",
+    "@types/mongodb": "^2.2.18",
+    "@types/morgan": "^1.7.35",
+    "@types/node": "^8.0.14",
+    "@types/passport": "^0.4.2",
+    "@types/pug": "^2.0.4",
+    "@types/source-map-support": "^0.4.0",
+    "@types/url-parse": "^1.1.0",
+    "@types/uuid": "^3.4.3",
+    "@types/winston": "^2.3.7",
     "husky": "^0.14.3",
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
     "prettier": "^1.9.2",
-    "ts-jest": "^22.0.0"
+    "ts-loader": "^2.3.0",
+    "typescript": "^2.4.1"
   }
 }

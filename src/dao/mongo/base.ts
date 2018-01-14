@@ -1,6 +1,6 @@
-import * as uuid from 'uuid';
+import * as _ from 'lodash';
 import * as MongoDB from 'mongodb';
-import _ = require('lodash');
+import * as uuid from 'uuid';
 
 import { LoggerFactory, WithLog } from '../../lib/logger';
 
