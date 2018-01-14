@@ -1,9 +1,0 @@
-extends layout.pug
-
-block content
-  h2 Activities
-  if activities.length
-    each val in activities
-      h4 #{val.name} - #{val.type} - #{val.startDate}
-  else
-    h3 Workout more
