@@ -1,6 +1,6 @@
 #!/bin/sh
 
-prettier --single-quote --trailing-comma all --write "{src, config}/**/*.{js,json,md,ts}"
+prettier --single-quote --trailing-comma all --write "{src, config, client}/**/*.{js,json,md,ts,tsx}"
 
 (cd client && npm run build)
 
