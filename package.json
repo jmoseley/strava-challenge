@@ -10,7 +10,8 @@
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
     "compile": "./scripts/compile.sh",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "postinstall": "cd client && npm install"
   },
   "lint-staged": {
     "*.{js,json,css,md,ts,tsx}": [
