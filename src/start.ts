@@ -8,7 +8,6 @@ import * as expressSession from 'express-session';
 import * as passport from 'passport';
 import * as morgan from 'morgan';
 import * as webpack from 'webpack';
-import * as webpackHotMiddleware from 'webpack-hot-middleware';
 import { Server } from 'net';
 
 import * as authHandler from './handlers/auth_handler';
@@ -89,7 +88,6 @@ export async function main() {
       publicPath: webpackConfig.output.publicPath,
     }),
   );
-  app.use(webpackHotMiddleware(compiler));
 
   const router = Router();
 
