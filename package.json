@@ -51,6 +51,8 @@
     "@types/source-map-support": "^0.4.0",
     "@types/url-parse": "^1.1.0",
     "@types/uuid": "^3.4.3",
+    "@types/webpack": "^3.8.4",
+    "@types/webpack-hot-middleware": "^2.16.2",
     "@types/winston": "^2.3.7",
     "connect-mongodb-session": "^1.4.0",
     "convict": "^4.0.2",
@@ -69,6 +71,8 @@
     "typescript": "^2.6.2",
     "url-parse": "^1.2.0",
     "uuid": "^3.1.0",
+    "webpack": "^3.10.0",
+    "webpack-dev-middleware": "^2.0.4",
     "winston": "^2.4.0"
   },
   "devDependencies": {
@@ -78,6 +82,7 @@
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
     "prettier": "^1.9.2",
-    "ts-jest": "^22.0.0"
+    "ts-jest": "^22.0.0",
+    "webpack-hot-middleware": "^2.21.0"
   }
 }

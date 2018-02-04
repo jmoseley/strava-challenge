@@ -6,4 +6,4 @@ mongod --dbpath .data/db > /dev/null &
 trap 'kill $(jobs -p)' EXIT
 trap 'kill 0' EXIT
 
-forever -t --watch --watchDirectory src --watchIgnore __tests__ --minUptime 1000 --spinSleepTime 1000 -c "npm start" ./
+NODE_ENV=development forever -t --watch --watchDirectory src --watchIgnore __tests__ --minUptime 1000 --spinSleepTime 1000 -c "npm start" ./

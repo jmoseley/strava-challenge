@@ -7,6 +7,8 @@ import * as Router from 'express-promise-router';
 import * as expressSession from 'express-session';
 import * as passport from 'passport';
 import * as morgan from 'morgan';
+import * as webpack from 'webpack';
+import * as webpackHotMiddleware from 'webpack-hot-middleware';
 import { Server } from 'net';
 
 import * as authHandler from './handlers/auth_handler';
@@ -14,10 +16,16 @@ import { config } from './config';
 import { getLogger } from './lib/logger';
 import { getSessionStore } from './lib/session_store';
 import { getContextGeneratorMiddleware } from './lib/context';
+import { compile } from 'morgan';
 
 const LOG = getLogger('main');
 
 const StravaStrategy = require('passport-strava-oauth2').Strategy;
+const webpackMiddleware = require('webpack-dev-middleware');
+
+// TODO: Remove For prod
+const webpackConfig = require('../client/config/webpack.config.dev');
+const compiler = webpack(webpackConfig);
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -63,9 +71,7 @@ export async function main() {
   const app: express.Application = express();
   app.use(morgan('tiny'));
   app.use(contextMiddleware());
-  app.set('view engine', 'pug');
   app.use(express.static('./client/build'));
-  app.set('views', './views');
   app.use(cookieParser(config.get('secret')));
   app.use(
     expressSession({
@@ -77,6 +83,13 @@ export async function main() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
+  // TODO: Remove this for prod.
+  app.use(
+    webpackMiddleware(compiler, {
+      publicPath: webpackConfig.output.publicPath,
+    }),
+  );
+  app.use(webpackHotMiddleware(compiler));
 
   const router = Router();
 
@@ -89,10 +102,10 @@ export async function main() {
     passport.authenticate('strava', { failureRedirect: '/' }),
     authHandler.callback,
   );
+  app.use(router);
+
   // TODO: Should we clear the users access token?
   app.get('/logout', authHandler.logout);
-
-  app.use(router);
 
   const PORT = config.get('port') as number;
 
