@@ -9,7 +9,6 @@ import * as passport from 'passport';
 import * as morgan from 'morgan';
 import { Server } from 'net';
 
-import * as pugHandler from './handlers/pug_handler';
 import * as authHandler from './handlers/auth_handler';
 import { config } from './config';
 import { getLogger } from './lib/logger';
@@ -65,7 +64,7 @@ export async function main() {
   app.use(morgan('tiny'));
   app.use(contextMiddleware());
   app.set('view engine', 'pug');
-  app.use(express.static('./public'));
+  app.use(express.static('./client/build'));
   app.set('views', './views');
   app.use(cookieParser(config.get('secret')));
   app.use(
@@ -80,9 +79,6 @@ export async function main() {
   app.use(passport.session());
 
   const router = Router();
-  router.get('/', pugHandler.index);
-  router.get('/friends', pugHandler.friends);
-  router.get('/activities', pugHandler.activities);
 
   router.get(
     '/auth/strava',
