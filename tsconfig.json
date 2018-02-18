@@ -8,14 +8,11 @@
     "jsx": "react",
     "allowJs": false,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "lib": ["es6", "dom"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "include": [
-    "client/**/*",
-    "server/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    ".meteor"
-  ]
+  "include": ["client/**/*", "server/**/*"],
+  "exclude": ["node_modules", ".meteor"]
 }
