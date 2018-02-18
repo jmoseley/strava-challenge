@@ -1,13 +1,8 @@
-import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { Meteor } from 'meteor/meteor';
-import { StatefullComponent } from './statefull.component';
-import { StatelessComponent } from './stateless.component';
 import styled from 'styled-components';
 
-// --------------------------
-// Render the two components
-// --------------------------
+import { StatefullComponent } from './statefull';
+import { StatelessComponent } from './stateless';
 
 const Wrapper = styled.div`
   h1 {
@@ -19,15 +14,16 @@ const Wrapper = styled.div`
   }
 `;
 
-Meteor.startup(function() {
-  ReactDOM.render(
+const App = () => {
+  return (
     <Wrapper>
       <h1>Stateless component</h1>
       <StatelessComponent opacity={0.5} />
 
       <h1>Statefull component with hover and click events</h1>
       <StatefullComponent opacity={1} />
-    </Wrapper>,
-    document.getElementById('app'),
+    </Wrapper>
   );
-});
+};
+
+export default App;

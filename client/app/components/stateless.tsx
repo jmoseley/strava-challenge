@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Block } from './block.component';
+import { Block } from './block';
 
 interface IProps {
   opacity: number;
