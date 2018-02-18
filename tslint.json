@@ -1,0 +1,39 @@
+{
+  "extends": [
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "class-name": true,
+    "comment-format": [true,
+      "check-space"
+    ],
+    "label-position": true,
+    "no-arg": true,
+    "no-conditional-assignment": true,
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-variable": true,
+    "no-empty": true,
+    "no-eval": true,
+    "no-console": [false],
+    "no-internal-module": true,
+    "no-shadowed-variable": true,
+    "no-switch-case-fall-through": true,
+    "no-var-keyword": true,
+    "switch-default": true,
+    "triple-equals": [true,
+      "allow-null-check"
+    ],
+    "typedef": [true,
+      "call-signature",
+      "parameter",
+      "property-declaration",
+      "member-variable-declaration"
+    ],
+    "variable-name": [true,
+      "check-format",
+      "allow-leading-underscore",
+      "ban-keywords"
+    ]
+  }
+}
