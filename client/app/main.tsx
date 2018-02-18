@@ -3,21 +3,30 @@ import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
 import styled from 'styled-components';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, combineReducers } from 'redux';
 import { combineInteractions } from 'redux-interactions';
+import { Router, Route, browserHistory } from 'react-router';
+import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 
-import App from './components/app';
+import Home from './scenes/home';
 
 const store = createStore(
-  combineInteractions({
-    // Eventually we'll have some interactions.
+  combineReducers({
+    ...combineInteractions({
+      // Eventually we'll have some interactions.
+    }),
+    routing: routerReducer,
   }),
 );
+
+const history = syncHistoryWithStore(browserHistory, store);
 
 Meteor.startup(function() {
   ReactDOM.render(
     <Provider store={store}>
-      <App />
+      <Router history={history}>
+        <Route path="/" component={Home} />
+      </Router>
     </Provider>,
     document.getElementById('app'),
   );
