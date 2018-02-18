@@ -22,3 +22,4 @@ barbatus:typescript
 service-configuration
 selaias:accounts-strava
 accounts-ui
+react-meteor-data
