@@ -5,10 +5,11 @@ import styled from 'styled-components';
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import { combineInteractions } from 'redux-interactions';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 
 import Home from './scenes/home';
+import Activities from './scenes/activities';
 
 const store = createStore(
   combineReducers({
@@ -25,7 +26,10 @@ Meteor.startup(function() {
   ReactDOM.render(
     <Provider store={store}>
       <Router history={history}>
-        <Route path="/" component={Home} />
+        <Route path="/">
+          <IndexRoute component={Home} />
+          <Route path="activities" component={Activities} />
+        </Route>
       </Router>
     </Provider>,
     document.getElementById('app'),
