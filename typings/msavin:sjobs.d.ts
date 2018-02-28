@@ -6,16 +6,16 @@ declare module 'meteor/msavin:sjobs' {
     maxWait: number;
   }
 
-  export interface RunArguments {
+  export type RunArguments = {
     [key: string]: any;
-  }
+  } | null;
 
   export interface JobsList {
     [jobId: string]: (args: RunArguments) => void;
   }
 
   export interface RunConfig {
-    in: {
+    in?: {
       millisecond?: number;
       milliseconds?: number;
       second?: number;
@@ -31,7 +31,7 @@ declare module 'meteor/msavin:sjobs' {
       year?: number;
       years?: number;
     };
-    on: {
+    on?: {
       millisecond?: number;
       milliseconds?: number;
       second?: number;
@@ -47,7 +47,7 @@ declare module 'meteor/msavin:sjobs' {
       year?: number;
       years?: number;
     };
-    priority: number;
+    priority?: number;
   }
 
   export interface JobsSingleton {
