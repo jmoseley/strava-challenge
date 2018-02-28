@@ -6,6 +6,9 @@ import { Mongo } from 'meteor/mongo';
 import StravaProviderDAO from './providers/strava';
 import { Collection as ActivitiesCollection } from '../imports/models/activities';
 
+// Start all the jobs.
+import './jobs';
+
 Meteor.publish('activities', () => {
   return ActivitiesCollection.find({ userId: Meteor.userId() });
 });

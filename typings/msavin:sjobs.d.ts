@@ -1,4 +1,9 @@
 declare module 'meteor/msavin:sjobs' {
+  export interface JobInstance {
+    success: (result?: any) => void;
+    failure: (result?: any) => void;
+    reschedule: (config: RunConfig) => void;
+  }
   export interface Config {
     autostart: boolean;
     interval: number;
