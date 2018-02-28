@@ -11,7 +11,8 @@
     "strictNullChecks": true,
     "lib": ["es6", "dom", "es2015"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "typeRoots": ["./typings"]
   },
   "include": ["client/**/*", "server/**/*"],
   "exclude": ["node_modules", ".meteor"]
