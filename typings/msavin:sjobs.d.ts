@@ -1,8 +1,30 @@
+import { Mongo } from 'meteor/mongo';
+
 declare module 'meteor/msavin:sjobs' {
+  export interface JobsInternalSingleton {
+    Utilities: {
+      collection: Mongo.Collection<JobModel>;
+    };
+  }
+
+  export interface JobModel {
+    _id: string;
+    name: string;
+    state: JobModel.State;
+  }
+
+  export namespace JobModel {
+    export enum State {
+      SUCCESS = 'success',
+      PENDING = 'pending',
+    }
+  }
+
   export interface JobInstance {
     success: (result?: any) => void;
     failure: (result?: any) => void;
     reschedule: (config: RunConfig) => void;
+    replicate: (config: RunConfig) => void;
   }
   export interface Config {
     autostart: boolean;
@@ -64,4 +86,6 @@ declare module 'meteor/msavin:sjobs' {
   }
 
   export const Jobs: JobsSingleton;
+
+  export const JobsInternal: JobsInternalSingleton;
 }

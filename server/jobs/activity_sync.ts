@@ -1,28 +1,15 @@
 import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
-import {
-  Jobs,
-  RunConfig,
-  RunArguments,
-  JobInstance,
-} from 'meteor/msavin:sjobs';
+import { RunArguments } from 'meteor/msavin:sjobs';
 import * as moment from 'moment';
 
-import { registerJob } from './';
+import { runRepeatingJob, JobResult } from './';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
-const SYNC_USER_ACTIVITIES_RUN_CONFIG: RunConfig = {
-  in: {
-    minutes: 5,
-  },
-};
-
 export const SYNC_USER_ACTIVITIES_JOB_ID = 'syncUserActivties';
 
-async function syncUserActivities(_args?: RunArguments) {
-  const self: JobInstance = this;
-
+async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
   console.info(`Running syncUserActivities`);
   const users = Meteor.users
     .find({
@@ -51,6 +38,7 @@ async function syncUserActivities(_args?: RunArguments) {
   console.info(`Found ${users.length} users to sync.`);
 
   for (const user of users) {
+    // TODO: Bulkkkkkk!
     const dao = new StravaProviderDAO(user);
 
     // TODO: Maybe we should limit this call to a certain number of activities?
@@ -58,7 +46,7 @@ async function syncUserActivities(_args?: RunArguments) {
     const activities = await dao.getActivities();
 
     console.info(
-      `Syncing ${activities.length} activities for user ${user._id}.`,
+      `Syncing ${activities.length} activities for user with id ${user._id}.`,
     );
 
     await Promise.all(
@@ -75,10 +63,11 @@ async function syncUserActivities(_args?: RunArguments) {
     Meteor.users.update({ _id: user._id }, { lastSyncedAt: new Date() });
   }
 
-  // Run the job again, so it keeps looping.
-  self.reschedule(SYNC_USER_ACTIVITIES_RUN_CONFIG);
+  return JobResult.SUCCESS;
 }
 
-registerJob({ name: SYNC_USER_ACTIVITIES_JOB_ID, run: syncUserActivities });
-console.info(`Running ${SYNC_USER_ACTIVITIES_JOB_ID} job.`);
-Jobs.run(SYNC_USER_ACTIVITIES_JOB_ID, null, SYNC_USER_ACTIVITIES_RUN_CONFIG);
+runRepeatingJob({
+  name: SYNC_USER_ACTIVITIES_JOB_ID,
+  job: syncUserActivities,
+  repeatMinutes: 5,
+});

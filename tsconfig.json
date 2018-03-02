@@ -15,5 +15,5 @@
     "typeRoots": ["./typings"]
   },
   "include": ["client/**/*", "server/**/*"],
-  "exclude": ["node_modules", ".meteor"]
+  "exclude": ["node_modules", ".meteor", "packages/meteor-roles"]
 }
