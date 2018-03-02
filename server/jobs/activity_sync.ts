@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
-import { RunArguments } from 'meteor/msavin:sjobs';
 import * as moment from 'moment';
 
-import { runRepeatingJob, JobResult } from './';
+import { runRepeatingJob, JobResult, RunArguments } from '../lib/jobs';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
