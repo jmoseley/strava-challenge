@@ -2,5 +2,6 @@
   "strava": {
     "clientId": 22338,
     "clientSecret": "f5d305c4042f06303d523b57ef5ff34247c7dd9b"
-  }
+  },
+  "rootUrl": "http://localhost:8765"
 }

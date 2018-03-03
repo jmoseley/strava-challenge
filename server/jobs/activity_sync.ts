@@ -9,7 +9,6 @@ import { Collection as ActivitiesCollection } from '../../imports/models/activit
 export const SYNC_USER_ACTIVITIES_JOB_ID = 'syncUserActivties';
 
 async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
-  console.info(`Running syncUserActivities`);
   const users = Meteor.users
     .find({
       $and: [

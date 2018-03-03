@@ -74,6 +74,8 @@ function jobWrapper(
   runConfig: RunConfig,
 ): (instance: JobInstance, args: RunArguments) => Promise<void> {
   return async (instance: JobInstance, args: RunArguments) => {
+    console.info(`Running job: ${name}`);
+
     try {
       const result = await job(args);
       console.debug(`Result (${name}): ${result}`);
