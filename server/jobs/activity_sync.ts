@@ -58,7 +58,10 @@ async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
 
     console.info(`Upadting lastSyncedAt for ${user._id}.`);
 
-    Meteor.users.update({ _id: user._id }, { lastSyncedAt: new Date() });
+    Meteor.users.update(
+      { _id: user._id },
+      { $set: { lastSyncedAt: new Date() } },
+    );
   }
 
   return JobResult.SUCCESS;
