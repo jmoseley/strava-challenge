@@ -1,47 +1,48 @@
 import { Mongo } from 'meteor/mongo';
 
 declare module 'meteor/msavin:sjobs' {
-  export interface JobsInternalSingleton {
+  interface JobsInternalSingleton {
     Utilities: {
       collection: Mongo.Collection<JobModel>;
     };
   }
 
-  export interface JobModel {
+  interface JobModel {
     _id: string;
     name: string;
     state: JobModel.State;
   }
 
-  export namespace JobModel {
+  namespace JobModel {
     export enum State {
       SUCCESS = 'success',
       PENDING = 'pending',
     }
   }
 
-  export interface JobInstance {
+  interface JobInstance {
     success: (result?: any) => void;
     failure: (result?: any) => void;
     reschedule: (config: RunConfig) => void;
     replicate: (config: RunConfig) => void;
   }
-  export interface Config {
+
+  interface Config {
     autostart: boolean;
     interval: number;
     startupDelay: number;
     maxWait: number;
   }
 
-  export type RunArguments = {
+  type RunArguments = {
     [key: string]: any;
   } | null;
 
-  export interface JobsList {
+  interface JobsList {
     [jobId: string]: (args: RunArguments) => void;
   }
 
-  export interface RunConfig {
+  interface RunConfig {
     in?: {
       millisecond?: number;
       milliseconds?: number;
@@ -77,7 +78,7 @@ declare module 'meteor/msavin:sjobs' {
     priority?: number;
   }
 
-  export interface JobsSingleton {
+  interface JobsSingleton {
     configure: (config: Config) => void;
     register: (jobs: JobsList) => void;
     // This is not a perfect reflection of the allowed arguments, but it simplifies the interface an allows
@@ -85,7 +86,7 @@ declare module 'meteor/msavin:sjobs' {
     run: (jobId: string, args: RunArguments, config: RunConfig) => void;
   }
 
-  export const Jobs: JobsSingleton;
+  const Jobs: JobsSingleton;
 
-  export const JobsInternal: JobsInternalSingleton;
+  const JobsInternal: JobsInternalSingleton;
 }
