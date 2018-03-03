@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
+import { HTTP } from 'meteor/http';
 import * as moment from 'moment';
 
 import { runRepeatingJob, JobResult, RunArguments } from '../lib/jobs';
@@ -9,7 +10,7 @@ import { Collection as ActivitiesCollection } from '../../imports/models/activit
 export const SELF_PING_JOB_ID = 'selfPing';
 
 async function selfPing(_args: RunArguments): Promise<JobResult> {
-  console.info(`Running ${SELF_PING_JOB_ID}`);
+  const result = HTTP.call('GET', `${Meteor.settings.rootUrl}/status`);
 
   return JobResult.SUCCESS;
 }
