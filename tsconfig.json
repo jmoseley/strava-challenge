@@ -13,6 +13,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["client/**/*", "server/**/*"],
+  "include": ["client/**/*", "server/**/*", "typings/**/*"],
   "exclude": ["node_modules", ".meteor"]
 }
