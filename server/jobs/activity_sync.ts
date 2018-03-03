@@ -67,5 +67,5 @@ async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
 runRepeatingJob({
   name: SYNC_USER_ACTIVITIES_JOB_ID,
   job: syncUserActivities,
-  repeatMinutes: 5,
+  repeatMinutes: 2,
 });
