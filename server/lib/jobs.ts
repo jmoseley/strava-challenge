@@ -65,7 +65,7 @@ export function runRepeatingJob({
     Jobs.cancel(pendingJob._id);
   }
   console.info(`Running ${name} job.`);
-  Jobs.run(name, args || null, runConfig);
+  Jobs.run(name, args || null, {});
 }
 
 function jobWrapper(
