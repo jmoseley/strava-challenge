@@ -9,30 +9,47 @@ import { Collection as ActivitiesCollection } from '../../imports/models/activit
 // Only use this for the repeating job.
 export const SYNC_USER_ACTIVITIES_JOB_ID = 'syncUserActivties';
 
-async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
-  const users = Meteor.users
-    .find({
-      $and: [
-        {
-          $or: [
-            {
-              lastSyncedAt: {
-                $lt: moment()
-                  .subtract(10, 'minutes')
-                  .toDate(),
+export interface SyncUserActivitiesArgs extends RunArguments {
+  userId?: string;
+}
+
+export async function syncUserActivities(
+  args: RunArguments,
+): Promise<JobResult> {
+  console.info(`Syncing user activities with args: ${JSON.stringify(args)}`);
+  let users: Meteor.User[];
+
+  if (args && args.userId) {
+    users = Meteor.users
+      .find({
+        _id: args.userId,
+      })
+      .fetch();
+  } else {
+    users = Meteor.users
+      .find({
+        $and: [
+          {
+            $or: [
+              {
+                lastSyncedAt: {
+                  $lt: moment()
+                    .subtract(10, 'minutes')
+                    .toDate(),
+                },
               },
-            },
-            {
-              lastSyncedAt: { $exists: false },
-            },
-          ],
-        },
-        {
-          'services.strava': { $exists: true },
-        },
-      ],
-    })
-    .fetch();
+              {
+                lastSyncedAt: { $exists: false },
+              },
+            ],
+          },
+          {
+            'services.strava': { $exists: true },
+          },
+        ],
+      })
+      .fetch();
+  }
 
   console.info(`Found ${users.length} users to sync.`);
 
