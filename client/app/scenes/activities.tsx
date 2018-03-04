@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { connect } from 'react-redux';
-// TODO: Meteor is badly typed :(
 import { withTracker } from 'meteor/react-meteor-data';
 import AccountsUIWrapper from '../components/accounts_ui_wrapper';
 

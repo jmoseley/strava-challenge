@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "moduleResolution": "node",
     "alwaysStrict": true,
     "sourceMap": true,
     "jsx": "react",
@@ -11,9 +10,7 @@
     "strictNullChecks": true,
     "lib": ["es6", "dom", "es2015"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "typeRoots": ["typings", "node_modules/@types"]
+    "emitDecoratorMetadata": true
   },
-  "include": ["client/**/*", "server/**/*"],
   "exclude": ["node_modules", ".meteor"]
 }
