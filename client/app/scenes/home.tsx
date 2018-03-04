@@ -3,7 +3,18 @@ import { Meteor } from 'meteor/meteor';
 import { connect } from 'react-redux';
 // TODO: Meteor is badly typed :(
 import { withTracker } from 'meteor/react-meteor-data';
-import AccountsUIWrapper from '../components/accounts_ui_wrapper';
+import styled from 'styled-components';
+
+const CoverWrapper = styled.div`
+  margin: 0;
+  padding: 0;
+`;
+
+const Cover = styled.img`
+  width: 100%;
+`;
+
+import NavBar from '../components/nav_bar';
 
 export interface DataProps {
   currentUser: Meteor.User;
@@ -19,10 +30,21 @@ class HomeScene extends React.Component<Props> {
   render() {
     return (
       <div>
-        <h1>Cycle Challenge</h1>
-        <AccountsUIWrapper />
-        {this.props.currentUser && <a href="/activities">Activities</a>}
+        <NavBar />
+        {this._renderCover()}
       </div>
+    );
+  }
+
+  _renderCover() {
+    if (this.props.currentUser) {
+      return null;
+    }
+
+    return (
+      <CoverWrapper>
+        <Cover src="/imgs/cover.jpeg" />
+      </CoverWrapper>
     );
   }
 }

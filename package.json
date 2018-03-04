@@ -19,6 +19,8 @@
     "moment": "^2.20.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-headroom": "^2.2.2",
+    "react-layout-components": "^3.0.6",
     "react-redux": "^5.0.7",
     "react-router": "^3.2.0",
     "react-router-redux": "^4.0.8",
