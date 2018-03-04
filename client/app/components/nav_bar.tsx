@@ -1,37 +1,40 @@
+import * as dapper from '@convoy/dapper';
 import * as React from 'react';
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
 
 import AccountsUIWrapper from '../components/accounts_ui_wrapper';
 
-const Menu = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-bottom: 0.5em;
+const STYLES = dapper.compile({
+  menuWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: '1em',
+    paddingRight: '1em',
 
-  border-bottom: 1px solid lightgrey;
-`;
-
-const Header = styled.h1`
-  margin: 0;
-  font-family: 'Coiny', sans-serif;
-`;
-
-const LoginButton = styled.span``;
+    borderBottom: '1px solid lightgrey',
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    margin: 0,
+    fontFamily: `'Coiny', sans-serif`,
+  },
+});
 
 export default class NavBar extends React.Component<{}> {
+  // TODO: Fix the types.
+  styles: any = dapper.reactTo(this, STYLES);
+
   render() {
     return (
       <Headroom>
-        <Menu>
-          <Header>Challenge</Header>
-          <LoginButton>
+        <div className={this.styles.menuWrapper}>
+          <h1 className={this.styles.header}>Challenge</h1>
+          <span>
             <AccountsUIWrapper />
-          </LoginButton>
-        </Menu>
+          </span>
+        </div>
       </Headroom>
     );
   }
