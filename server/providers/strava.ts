@@ -8,7 +8,7 @@ import { ActivityCreateOptions } from '../../imports/models/activities';
 
 // OMG types....
 const strava = require('strava-v3');
-// const listFriends = util.promisify(strava.athlete.listFriends);
+const getAthlete = util.promisify(strava.athlete.get);
 const listActivities = util.promisify(strava.athlete.listActivities);
 
 export interface User {
@@ -41,30 +41,29 @@ export default class StravaProviderDAO implements BaseProviderDAO {
     });
   }
 
-  // public async getFriends(user: User): Promise<StravaUser[]> {
-  //   const rawFriends: RawStravaUser[] = await listFriends({
-  //     access_token: user.accessToken,
-  //   });
+  public async isMutualFriend(friend: Meteor.User): Promise<boolean> {
+    const accessToken = _.get(friend, 'services.strava.accessToken');
+    if (!accessToken) {
+      console.info(`Friend does not have access token, skipping friend check.`);
+      return false;
+    }
 
-  //   return _.map(rawFriends, this.convertUser);
-  // }
+    // Get the athlete as the friend to check if this user is a friend.
+    const user: RawStravaUser = await getAthlete({ access_token: accessToken });
+    console.log('user result', user);
 
-  // private convertUser(rawUser: RawStravaUser): StravaUser {
-  //   // Handles default profile images that look like 'avatar/athlete/large.png' or 'avatar/athlete/medium.png'
-  //   if (rawUser.profile) {
-  //     const profileUrl = URL(rawUser.profile);
-  //     if (!profileUrl.hostname) {
-  //       rawUser.profile = undefined as any;
-  //     }
-  //   }
+    // Let's only worry about mutual friends for now....
+    if (
+      user.friend &&
+      (user.friend === 'true' || (user.friend as any) === true) &&
+      (user.follower &&
+        (user.follower === 'true' || (user.follower as any) === true))
+    ) {
+      return true;
+    }
 
-  //   return {
-  //     providerId: rawUser.id.toString(),
-  //     provider: 'strava',
-  //     displayName: `${rawUser.firstname} ${rawUser.lastname}`,
-  //     avatarUrl: rawUser.profile,
-  //   };
-  // }
+    return false;
+  }
 
   private convertActivity(
     rawActivity: RawStravaActivity,
