@@ -2,10 +2,11 @@ import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import * as moment from 'moment';
 
-import { runRepeatingJob, JobResult, RunArguments } from '../lib/jobs';
+import { runJob, JobResult, RunArguments } from '../lib/jobs';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
+// Only use this for the repeating job.
 export const SYNC_USER_ACTIVITIES_JOB_ID = 'syncUserActivties';
 
 async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
@@ -67,8 +68,8 @@ async function syncUserActivities(_args: RunArguments): Promise<JobResult> {
   return JobResult.SUCCESS;
 }
 
-runRepeatingJob({
+runJob({
   name: SYNC_USER_ACTIVITIES_JOB_ID,
   job: syncUserActivities,
-  repeatMinutes: 2,
+  repeatSeconds: 2 * 60, // 2 minutes
 });

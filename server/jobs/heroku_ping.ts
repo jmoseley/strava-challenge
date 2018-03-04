@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 import * as moment from 'moment';
 
-import { runRepeatingJob, JobResult, RunArguments } from '../lib/jobs';
+import { runJob, JobResult, RunArguments } from '../lib/jobs';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
@@ -15,8 +15,8 @@ async function selfPing(_args: RunArguments): Promise<JobResult> {
   return JobResult.SUCCESS;
 }
 
-runRepeatingJob({
+runJob({
   name: SELF_PING_JOB_ID,
   job: selfPing,
-  repeatMinutes: 5,
+  repeatSeconds: 5 * 60, // 5 minutes
 });

@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Promise as MeteorPromise } from 'meteor/promise';
 import {
   Jobs,
@@ -32,22 +33,32 @@ export function registerJob({
   });
 }
 
-export function runRepeatingJob({
+/**
+ * name - Name of the job to run
+ * job - The function to run for this job
+ * args - The arguments for the job
+ * repeatSeconds - How long to delay between repeat runs of the job. If this is not provided, the job will not
+ *                 repeat, and it will be run immediately.
+ */
+export function runJob({
   name,
   job,
   args,
-  repeatMinutes,
+  repeatSeconds,
 }: {
   name: string;
   job: (args: RunArguments) => Promise<JobResult>;
   args?: RunArguments;
-  repeatMinutes: number;
+  repeatSeconds?: number;
 }) {
-  const runConfig: RunConfig = {
-    in: {
-      minutes: repeatMinutes,
-    },
-  };
+  let runConfig: RunConfig;
+  if (_.isNumber(repeatSeconds)) {
+    runConfig = {
+      in: {
+        seconds: repeatSeconds,
+      },
+    };
+  }
 
   const wrappedJob = jobWrapper(name, job, runConfig);
 
@@ -65,13 +76,14 @@ export function runRepeatingJob({
     Jobs.cancel(pendingJob._id);
   }
   console.info(`Running ${name} job.`);
+  // Run the job immediately.
   Jobs.run(name, args || null, {});
 }
 
 function jobWrapper(
   name: string,
   job: (args: RunArguments) => Promise<JobResult>,
-  runConfig: RunConfig,
+  repeatRunConfig?: RunConfig,
 ): (instance: JobInstance, args: RunArguments) => Promise<void> {
   return async (instance: JobInstance, args: RunArguments) => {
     console.info(`Running job: ${name}`);
@@ -81,21 +93,23 @@ function jobWrapper(
       console.debug(`Result (${name}): ${result}`);
       switch (result) {
         case JobResult.SUCCESS:
-          instance.replicate(runConfig);
+          if (repeatRunConfig) {
+            instance.replicate(repeatRunConfig);
+          }
           instance.success();
           break;
         case JobResult.RETRY_WITH_DELAY:
           console.info(`Retrying (${name}) due to result.`);
-          instance.reschedule(runConfig);
+          instance.reschedule(repeatRunConfig || {});
           break;
         default:
           console.error(`Unknown job result.`);
-          instance.reschedule(runConfig);
+          instance.reschedule(repeatRunConfig || {});
       }
       return;
     } catch (error) {
       console.error(`Error executing job ${name}: ${error.message}. Retrying.`);
-      instance.reschedule(runConfig);
+      instance.reschedule(repeatRunConfig || {});
       return;
     }
   };
