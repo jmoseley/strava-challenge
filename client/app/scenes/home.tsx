@@ -54,7 +54,7 @@ class HomeScene extends React.Component<Props> {
   render() {
     return (
       <div className={this.styles.bg}>
-        <NavBar />
+        <NavBar currentUser={this.props.currentUser} />
         {this._renderCover()}
         {this._renderUserData()}
       </div>

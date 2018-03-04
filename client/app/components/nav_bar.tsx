@@ -1,9 +1,10 @@
 import * as dapper from '@convoy/dapper';
+import { Meteor } from 'meteor/meteor';
 import * as React from 'react';
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
 
-import AccountsUIWrapper from '../components/accounts_ui_wrapper';
+import LoginButton from '../components/login_button';
 
 const STYLES = dapper.compile({
   menuWrapper: {
@@ -22,7 +23,11 @@ const STYLES = dapper.compile({
   },
 });
 
-export default class NavBar extends React.Component<{}> {
+export interface Props {
+  currentUser: Meteor.User;
+}
+
+export default class NavBar extends React.Component<Props> {
   // TODO: Fix the types.
   styles: any = dapper.reactTo(this, STYLES);
 
@@ -32,7 +37,7 @@ export default class NavBar extends React.Component<{}> {
         <div className={this.styles.menuWrapper}>
           <h1 className={this.styles.header}>Challenge</h1>
           <span>
-            <AccountsUIWrapper />
+            <LoginButton currentUser={this.props.currentUser} />
           </span>
         </div>
       </Headroom>
