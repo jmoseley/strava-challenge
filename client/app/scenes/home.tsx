@@ -39,7 +39,7 @@ const STYLES = dapper.compile({
 export interface DataProps {
   currentUser: Meteor.User;
   loading?: boolean;
-  activities: Activity[];
+  recentRides: Activity[];
 }
 
 export interface StateProps {
@@ -68,7 +68,7 @@ class HomeScene extends React.Component<Props> {
 
     return (
       <div className={this.styles.homepage}>
-        <h2 className={this.styles.heading}>Recent Activities</h2>
+        <h2 className={this.styles.heading}>Recent Rides</h2>
         <div>{this._renderActivities()}</div>
       </div>
     );
@@ -91,7 +91,7 @@ class HomeScene extends React.Component<Props> {
       return <div>Loading...</div>;
     }
 
-    return this.props.activities.map(activity => {
+    return this.props.recentRides.map(activity => {
       return <ActivityCard activity={activity} key={activity._id} />;
     });
   }
@@ -108,7 +108,7 @@ function dataLoader(): DataProps {
   return {
     loading: !activitiesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
-    activities: ActivitiesCollection.find(
+    recentRides: ActivitiesCollection.find(
       {},
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
