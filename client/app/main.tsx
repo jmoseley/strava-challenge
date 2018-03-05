@@ -9,7 +9,6 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 
 import Home from './scenes/home';
-import Activities from './scenes/activities';
 
 const store = createStore(
   combineReducers({
@@ -28,7 +27,6 @@ Meteor.startup(function() {
       <Router history={history}>
         <Route path="/">
           <IndexRoute component={Home} />
-          <Route path="activities" component={Activities} />
         </Route>
       </Router>
     </Provider>,

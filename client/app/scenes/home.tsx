@@ -25,14 +25,14 @@ const Cover = styled.img`
 const STYLES = dapper.compile({
   heading: {
     marginTop: '0.2em',
-    fontFamily: `'Coiny', sans-serif`,
     fontWeight: 'lighter',
   },
   homepage: {
     padding: '0.5em',
   },
-  bg: {
+  body: {
     height: '100%',
+    fontFamily: `'Roboto', sans-serif`,
   },
 });
 
@@ -53,7 +53,7 @@ class HomeScene extends React.Component<Props> {
 
   render() {
     return (
-      <div className={this.styles.bg}>
+      <div className={this.styles.body}>
         <NavBar currentUser={this.props.currentUser} />
         {this._renderCover()}
         {this._renderUserData()}

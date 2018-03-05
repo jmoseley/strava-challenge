@@ -19,7 +19,8 @@ const STYLES = dapper.compile({
   },
   header: {
     margin: 0,
-    fontFamily: `'Coiny', sans-serif`,
+    paddingBottom: '0.1em',
+    fontFamily: `'Lobster', sans-serif`,
   },
 });
 
