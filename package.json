@@ -31,7 +31,8 @@
     "redux-interactions": "^2.3.86",
     "strava-v3": "^1.14.0",
     "styled-components": "^3.1.6",
-    "url-parse": "^1.2.0"
+    "url-parse": "^1.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/es6-promise": "^3.3.0",
@@ -45,6 +46,7 @@
     "@types/react-router-redux": "^4.0.51",
     "@types/redux-form": "^7.2.2",
     "@types/url-parse": "^1.1.0",
+    "@types/uuid": "^3.4.3",
     "husky": "^0.14.3",
     "lint-staged": "^6.1.1",
     "prettier": "^1.10.2",

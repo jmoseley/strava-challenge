@@ -10,8 +10,10 @@ import {
   WrappedFieldProps,
 } from 'redux-form';
 import { Promise as MeteorPromise } from 'meteor/promise';
+import { Meteor } from 'meteor/meteor';
+import * as uuid from 'uuid';
 
-import { Challenge } from '../../../imports/models/challenges';
+import { ChallengeCreateOptions } from '../../../imports/models/challenges';
 
 const STYLES = dapper.compile({
   challenge: {
@@ -32,10 +34,20 @@ const isNumber = (value: string) =>
 
 export interface FormData {
   challengeName: string;
+  goal: string;
 }
 
 const onSubmit = async (values: FormData) => {
   // Bunch of defaults for now.
+  Meteor.call('challenge.create', {
+    newChallenge: {
+      name: values.challengeName,
+      startDayOfWeek: 0, // Sunday
+      durationWeeks: 1, // 1 week,
+      repeats: true,
+      distanceMiles: parseFloat(values.goal),
+    },
+  }); // ChallengeCreateOptions
 };
 
 const renderField = ({

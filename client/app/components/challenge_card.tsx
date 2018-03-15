@@ -28,6 +28,7 @@ export default class ChallengeCard extends React.Component<Props> {
     return (
       <div className={this.styles.challenge}>
         <h3 className={this.styles.title}>{this.props.challenge.name}</h3>
+        <span>{this.props.challenge.distanceMiles} miles</span>
       </div>
     );
   }
