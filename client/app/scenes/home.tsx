@@ -17,6 +17,7 @@ import {
 } from '../../../imports/models/challenges';
 import ActivityCard from '../components/activity_card';
 import ChallengeCard from '../components/challenge_card';
+import CreateChallenge from '../components/create_challenge';
 
 const CoverWrapper = styled.div`
   margin: 0;
@@ -104,9 +105,14 @@ class HomeScene extends React.Component<Props> {
   }
 
   _renderChallenges() {
-    return this.props.challenges.map(challenge => {
-      return <ChallengeCard challenge={challenge} key={challenge._id} />;
-    });
+    return (
+      <div>
+        <CreateChallenge />
+        {this.props.challenges.map(challenge => {
+          return <ChallengeCard challenge={challenge} key={challenge._id} />;
+        })}
+      </div>
+    );
   }
 
   _renderRecentRides() {
