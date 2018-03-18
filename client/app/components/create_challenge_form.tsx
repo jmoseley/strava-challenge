@@ -38,8 +38,9 @@ export interface FormData {
 }
 
 const onSubmit = async (values: FormData) => {
+  // TODO: It would be nice if we could get this type checking for free. Maybe we add types for the Meteor.call method?
   // Bunch of defaults for now.
-  Meteor.call('challenge.create', {
+  const args: { newChallenge: ChallengeCreateOptions } = {
     newChallenge: {
       name: values.challengeName,
       startDayOfWeek: 0, // Sunday
@@ -47,7 +48,8 @@ const onSubmit = async (values: FormData) => {
       repeats: true,
       distanceMiles: parseFloat(values.goal),
     },
-  }); // ChallengeCreateOptions
+  };
+  Meteor.call('challenge.create', args);
 };
 
 const renderField = ({
