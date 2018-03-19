@@ -9,6 +9,7 @@ import {
   InjectedFormProps,
   WrappedFieldProps,
   SubmissionError,
+  reset,
 } from 'redux-form';
 import { Promise as MeteorPromise } from 'meteor/promise';
 import { Meteor } from 'meteor/meteor';
@@ -44,38 +45,38 @@ export interface Props {
   challengeId: string;
 }
 
-const onSubmit = async (
-  values: FormData,
-  _dispatch: Dispatch<any>,
-  props: Props,
-) => {
-  // TODO: It would be nice if we could get this type checking for free. Maybe we add types for the Meteor.call method?
-  const args: ChallengeInviteOptions = {
-    email: values.email,
-    challengeId: props.challengeId,
-  };
+const onSubmitFactory = (formName: string) => {
+  return async (values: FormData, dispatch: Dispatch<any>, props: Props) => {
+    // TODO: It would be nice if we could get this type checking for free. Maybe we add types for the Meteor.call method?
+    const args: ChallengeInviteOptions = {
+      email: values.email,
+      challengeId: props.challengeId,
+    };
 
-  try {
-    const result = await new Promise((resolve, reject) => {
-      Meteor.call('challenge.invite', args, (error: Meteor.Error, r: any) => {
-        if (error) reject(error);
-        resolve(r);
-      });
-    });
-  } catch (err) {
-    switch (err.error) {
-      case Errors.ALREADY_MEMBER:
-        throw new SubmissionError({
-          email: 'User is already a member of this challenge. ',
+    try {
+      const result = await new Promise((resolve, reject) => {
+        Meteor.call('challenge.invite', args, (error: Meteor.Error, r: any) => {
+          if (error) reject(error);
+          resolve(r);
         });
-      case Errors.NOT_FOUND:
-        throw new SubmissionError();
-      case Errors.UNAUTHORIZED:
-        throw new SubmissionError();
-      default:
-        throw new Error('Invalid response from server.');
+      });
+    } catch (err) {
+      switch (err.error) {
+        case Errors.ALREADY_MEMBER:
+          throw new SubmissionError({
+            email: 'User is already a member of this challenge. ',
+          });
+        case Errors.NOT_FOUND:
+          throw new SubmissionError();
+        case Errors.UNAUTHORIZED:
+          throw new SubmissionError();
+        default:
+          throw new Error('Invalid response from server.');
+      }
     }
-  }
+
+    dispatch(reset(formName));
+  };
 };
 
 const renderField = ({
@@ -93,9 +94,10 @@ const renderField = ({
 
 const InviteToChallengeForm = ({
   handleSubmit,
+  form,
 }: InjectedFormProps<FormData, Props>) => {
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmitFactory(form))}>
       <Field
         label="Email"
         name="email"
