@@ -15,5 +15,6 @@ export interface ChallengeInvite
 
 export interface ChallengeInviteCreateOptions {
   inviteeId: string;
-  challengeId: string;
+  challengeId?: string;
+  email?: string;
 }
