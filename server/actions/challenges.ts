@@ -87,9 +87,10 @@ Meteor.methods({
       recipients: [email],
       templateId: EMAIL_TEMPLATES.CHALLENGE_INVITE,
       substitutions: {
-        inviter: Meteor.user().profile,
+        inviterName: _.get(Meteor.user(), 'profile.fullName'),
         acceptUrl: buildAcceptUrl(challengeInviteId),
-        challenge,
+        challengeName: challenge.name,
+        challengeDistanceMiles: challenge.distanceMiles,
       },
     });
   },

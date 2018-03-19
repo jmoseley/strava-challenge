@@ -1,4 +1,10 @@
-import { MailService } from '@sendgrid/mail';
+import * as _ from 'lodash';
+import * as sendgrid from '@sendgrid/mail';
+
+if (process.env.SENDGRID_API_KEY) {
+  sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+}
+sendgrid.setSubstitutionWrappers('{{', '}}');
 
 // TODO: We need a domain!
 const sourceEmail = 'jeremy@jeremymoseley.net';
@@ -11,14 +17,10 @@ export enum EMAIL_TEMPLATES {
 // template ID.
 // Maybe we want to persist the templates as code? https://github.com/niftylettuce/email-templates
 export interface EmailSubstitutions {
-  inviter: {
-    fullName: string;
-  };
+  inviterName: string;
   acceptUrl: string;
-  challenge: {
-    name: string;
-    distanceMiles: number;
-  };
+  challengeName: string;
+  challengeDistanceMiles: number;
   [key: string]: any;
 }
 
@@ -57,9 +59,9 @@ export async function sendEmail({
     recipients = [devEmail];
   }
   console.info(
-    `Sending email with subject '${subject}' to recipients ${recipients}.`,
+    `Sending email with templateId '${templateId}' to recipients ${recipients}.`,
   );
-  const result = await MailService.sendMultiple({
+  const result = await sendgrid.send({
     subject,
     templateId,
     substitutions,
@@ -70,12 +72,12 @@ export async function sendEmail({
 }
 
 function getDevEmail() {
-  return process.env['DEV_EMAIL'];
+  return process.env.DEV_EMAIL;
 }
 
 function isEmailEnabled() {
-  const haveApiKey = !!process.env['SENDGRID_API_KEY'];
-  const enabled = Meteor.settings.email.enabled;
+  const haveApiKey = !!process.env.SENDGRID_API_KEY;
+  const enabled = _.get(Meteor.settings, 'email.enabled', false);
   const hasDevEmail = !!getDevEmail();
 
   return haveApiKey && (enabled || hasDevEmail);
