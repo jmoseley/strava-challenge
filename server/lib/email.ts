@@ -3,6 +3,25 @@ import { MailService } from '@sendgrid/mail';
 // TODO: We need a domain!
 const sourceEmail = 'jeremy@jeremymoseley.net';
 
+export enum EMAIL_TEMPLATES {
+  CHALLENGE_INVITE = 'ee409f8f-4d1b-4b67-ab2f-1df34de5af04',
+}
+
+// So far this is generic for all templates. We should figure out a way to pair the right types to the right
+// template ID.
+// Maybe we want to persist the templates as code? https://github.com/niftylettuce/email-templates
+export interface EmailSubstitutions {
+  inviter: {
+    fullName: string;
+  };
+  acceptUrl: string;
+  challenge: {
+    name: string;
+    distanceMiles: string;
+  };
+  [key: string]: any;
+}
+
 export interface Recipient {
   name: string;
   email: string;
@@ -10,22 +29,22 @@ export interface Recipient {
 
 export interface SendEmailArgs {
   subject: string;
-  text: string;
-  html: string;
   recipients: (string | Recipient)[];
+  templateId: EMAIL_TEMPLATES;
+  substitutions: EmailSubstitutions;
 }
 
 export async function sendEmail({
   subject,
-  text,
-  html,
   recipients,
+  templateId,
+  substitutions,
 }: SendEmailArgs): Promise<void> {
   if (!isEmailEnabled()) {
     console.info(`Sending email is disabled.`);
     console.info(`Subject: `, subject);
-    console.info(`Text: `, text);
-    console.info(`HTML: `, html);
+    console.info(`Template ID: `, templateId);
+    console.info(`Substitutions: `, substitutions);
     console.info(`Recipients: `, recipients);
 
     return;
@@ -42,8 +61,8 @@ export async function sendEmail({
   );
   const result = await MailService.sendMultiple({
     subject,
-    text,
-    html,
+    templateId,
+    substitutions,
     to: recipients,
     from: sourceEmail,
   });
