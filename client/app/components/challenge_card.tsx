@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { Quantity } from '@neutrium/quantity';
 
 import { Challenge } from '../../../imports/models/challenges';
+import InviteToChallengeForm from './invite_to_challenge_form';
 
 const STYLES = dapper.compile({
   challenge: {
@@ -29,6 +30,12 @@ export default class ChallengeCard extends React.Component<Props> {
       <div className={this.styles.challenge}>
         <h3 className={this.styles.title}>{this.props.challenge.name}</h3>
         <span>{this.props.challenge.distanceMiles} miles</span>
+        {this.props.challenge.creatorId === Meteor.userId() && (
+          <InviteToChallengeForm
+            form={`inviteToChallenge-${this.props.challenge._id}`}
+            challengeId={this.props.challenge._id}
+          />
+        )}
       </div>
     );
   }
