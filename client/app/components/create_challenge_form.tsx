@@ -88,7 +88,6 @@ const CreateChallengeForm = ({ handleSubmit }: InjectedFormProps) => {
 
 // Can we type the state?
 const mapStateToProps = (state: any) => {
-  console.log('state', state);
   return {
     name: state.name,
   };

@@ -25,6 +25,7 @@ import {
 import ActivityCard from '../components/activity_card';
 import ChallengeCard from '../components/challenge_card';
 import CreateChallenge from '../components/create_challenge';
+import AcceptChallengeCard from '../components/accept_challenge_card';
 import { locationShape } from 'react-router';
 
 const CoverWrapper = styled.div`
@@ -153,7 +154,10 @@ class HomeScene extends React.Component<Props> {
     return (
       <div>
         <h3>Accept Challenge</h3>
-        <AcceptChallengeForm challenge={challenge} />
+        <AcceptChallengeCard
+          challenge={challenge}
+          challengeInvite={this.props.challengeInvite}
+        />
       </div>
     );
   }

@@ -32,6 +32,43 @@ Meteor.methods({
       _id: uuid.v4(),
     });
   },
+  'challenge.accept': ({
+    challengeInviteId,
+  }: {
+    challengeInviteId: string;
+  }) => {
+    const challengeInvite = ChallengeInviteCollection.findOne({
+      _id: challengeInviteId,
+    });
+
+    if (!challengeInvite) {
+      throw new Meteor.Error(Errors.NOT_FOUND, 'Challenge Invite not found.');
+    }
+
+    const email =
+      _.get(Meteor.user(), 'profile.email') ||
+      _.get(Meteor.user(), 'services.strava.email');
+    if (
+      (challengeInvite.inviteeId &&
+        Meteor.userId() !== challengeInvite.inviteeId) ||
+      challengeInvite.email !== email
+    ) {
+      throw new Meteor.Error(
+        Errors.UNAUTHORIZED,
+        'Only the invitee can accept a challenge invite.',
+      );
+    }
+
+    console.info(`Accepting invite for user ${Meteor.userId}.`);
+    ChallengeInviteCollection.update(
+      { _id: challengeInvite._id },
+      { status: ChallengeInviteStatus.FULFILLED },
+    );
+    ChallengeCollection.update(
+      { _id: challengeInvite.challengeId },
+      { $addToSet: { members: Meteor.userId() } },
+    );
+  },
   'challenge.invite': async ({
     email,
     challengeId,
@@ -101,7 +138,7 @@ function buildAcceptUrl(challengeInviteId: string): string {
 
   // All of this is basically arbitrary. Just vaguely disguising how this mechanism works for no good reason.
   const param = toBase64Url(JSON.stringify({ challengeInviteId }));
-  const acceptUrl = new url.URL('/accept-invite', baseUrl);
+  const acceptUrl = new url.URL('/', baseUrl);
   acceptUrl.search = `_p=${param}`;
 
   return acceptUrl.toString();
