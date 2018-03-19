@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import base64 from 'base64url';
 import * as uuid from 'uuid';
 import * as url from 'url';
 import { Meteor } from 'meteor/meteor';
+import { toBase64Url } from 'b64u-lite';
 
 import {
   Collection as ChallengeCollection,
@@ -100,7 +100,7 @@ function buildAcceptUrl(challengeInviteId: string): string {
   const baseUrl = Meteor.settings.rootUrl;
 
   // All of this is basically arbitrary. Just vaguely disguising how this mechanism works for no good reason.
-  const param = base64(JSON.stringify({ challengeInviteId }));
+  const param = toBase64Url(JSON.stringify({ challengeInviteId }));
   const acceptUrl = new url.URL('/accept-invite', baseUrl);
   acceptUrl.search = `_p=${param}`;
 

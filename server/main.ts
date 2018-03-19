@@ -36,8 +36,36 @@ Meteor.publish('activities', () => {
 });
 
 Meteor.publish('challenges', () => {
+  // Also publish any challenges related to outstanding invites for this user.
+  const challengeInvites = ChallengeInvitesCollection.find({
+    $or: [
+      { email: _.get(Meteor.user(), 'profile.email') },
+      { email: _.get(Meteor.user(), 'services.strava.email') },
+      { inviteeId: Meteor.userId() },
+    ],
+  }).fetch();
+
+  console.log(
+    'challengeInvites',
+    _(challengeInvites)
+      .map(ci => ci.challengeId)
+      .uniq()
+      .value(),
+  );
+
   return ChallengesCollection.find({
-    $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+    $or: [
+      { creatorId: Meteor.userId() },
+      { members: Meteor.userId() },
+      {
+        _id: {
+          $in: _(challengeInvites)
+            .map(ci => ci.challengeId)
+            .uniq()
+            .value(),
+        },
+      },
+    ],
   });
 });
 
