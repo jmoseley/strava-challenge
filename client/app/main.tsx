@@ -10,6 +10,7 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 
 import Home from './scenes/home';
+import AcceptChallengeInvite from './scenes/accept_challenge_invite';
 
 const store = createStore(
   combineReducers({
@@ -29,6 +30,7 @@ Meteor.startup(function() {
       <Router history={history}>
         <Route path="/">
           <IndexRoute component={Home} />
+          <Route path="accept-invite" component={AcceptChallengeInvite} />
         </Route>
       </Router>
     </Provider>,
