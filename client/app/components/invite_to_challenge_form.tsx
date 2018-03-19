@@ -8,6 +8,7 @@ import {
   reduxForm,
   InjectedFormProps,
   WrappedFieldProps,
+  SubmissionError,
 } from 'redux-form';
 import { Promise as MeteorPromise } from 'meteor/promise';
 import { Meteor } from 'meteor/meteor';
@@ -16,6 +17,7 @@ import * as uuid from 'uuid';
 import {
   ChallengeCreateOptions,
   ChallengeInviteOptions,
+  Errors,
 } from '../../../imports/models/challenges';
 import { Dispatch } from 'redux';
 
@@ -52,7 +54,28 @@ const onSubmit = async (
     email: values.email,
     challengeId: props.challengeId,
   };
-  Meteor.call('challenge.invite', args);
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      Meteor.call('challenge.invite', args, (error: Meteor.Error, r: any) => {
+        if (error) reject(error);
+        resolve(r);
+      });
+    });
+  } catch (err) {
+    switch (err.error) {
+      case Errors.ALREADY_MEMBER:
+        throw new SubmissionError({
+          email: 'User is already a member of this challenge. ',
+        });
+      case Errors.NOT_FOUND:
+        throw new SubmissionError();
+      case Errors.UNAUTHORIZED:
+        throw new SubmissionError();
+      default:
+        throw new Error('Invalid response from server.');
+    }
+  }
 };
 
 const renderField = ({

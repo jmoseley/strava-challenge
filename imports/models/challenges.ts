@@ -7,6 +7,12 @@ import { BaseModel } from './base';
 
 export const Collection = new Mongo.Collection<Challenge>('challenges');
 
+export enum Errors {
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  ALREADY_MEMBER = 'ALREADY_MEMBER',
+}
+
 export interface Challenge extends ChallengeCreateOptions, BaseModel {
   members: string[];
   creatorId: string;

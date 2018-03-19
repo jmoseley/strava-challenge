@@ -6,6 +6,7 @@ import {
   Collection as ChallengeCollection,
   ChallengeCreateOptions,
   ChallengeInviteOptions,
+  Errors,
 } from '../../imports/models/challenges';
 import {
   Collection as ChallengeInviteCollection,
@@ -30,14 +31,21 @@ Meteor.methods({
   },
   'challenge.invite': ({ email, challengeId }: ChallengeInviteOptions) => {
     // TODO: Validation. Typescript helps, but dosen't protect us from maliciousness.
-    // For now only allow the owner of the challenge to invite people. Maybe we should open this up in the
-    // future?
+    console.info(`Inviting ${email} to challenge ${challengeId}`);
     const challenge = ChallengeCollection.findOne({ _id: challengeId });
     if (!challenge) {
-      throw new Error(`Challenge now found.`);
+      console.info(`Challenge not found.`);
+      throw new Meteor.Error(Errors.NOT_FOUND, `Challenge not found.`);
     }
+
+    // For now only allow the owner of the challenge to invite people. Maybe we should open this up in the
+    // future?
     if (Meteor.userId() !== challenge.creatorId) {
-      throw new Error(`Only the owner can invite people.`);
+      console.info(`User is not owner of challenge.`);
+      throw new Meteor.Error(
+        Errors.UNAUTHORIZED,
+        `Only the owner can invite people.`,
+      );
     }
 
     const invitee = Meteor.users.findOne({
@@ -46,19 +54,28 @@ Meteor.methods({
 
     // Ensure the user is not already a member of the challenge.
     if (invitee && _.includes(challenge.members, invitee._id)) {
-      throw new Error(`This user is already a member of this challenge.`);
+      console.info(`User is already a member of this challenge.`);
+      throw new Meteor.Error(
+        Errors.ALREADY_MEMBER,
+        `This user is already a member of this challenge.`,
+      );
     }
 
-    ChallengeInviteCollection.insert({
-      _id: uuid.v4(),
-      challengeId: challenge._id,
-      inviteeId: _.get(invitee, '_id'),
-      email,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: ChallengeInviteStatus.PENDING,
-    });
+    // ChallengeInviteCollection.insert({
+    //   _id: uuid.v4(),
+    //   challengeId: challenge._id,
+    //   inviteeId: _.get(invitee, '_id'),
+    //   email,
+    //   createdAt: new Date(),
+    //   updatedAt: new Date(),
+    //   status: ChallengeInviteStatus.PENDING,
+    // });
 
     // Send the email!
+    if (invitee) {
+      // User is already on the platform, just send them a simple invite.
+    } else {
+      // User is not on the platform yet, this is an opportunity to grow user base.
+    }
   },
 });
