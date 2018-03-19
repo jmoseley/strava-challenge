@@ -17,7 +17,7 @@ export interface EmailSubstitutions {
   acceptUrl: string;
   challenge: {
     name: string;
-    distanceMiles: string;
+    distanceMiles: number;
   };
   [key: string]: any;
 }
@@ -28,7 +28,7 @@ export interface Recipient {
 }
 
 export interface SendEmailArgs {
-  subject: string;
+  subject?: string;
   recipients: (string | Recipient)[];
   templateId: EMAIL_TEMPLATES;
   substitutions: EmailSubstitutions;

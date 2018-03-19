@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
+import base64 from 'base64url';
 import * as uuid from 'uuid';
+import * as url from 'url';
 import { Meteor } from 'meteor/meteor';
 
 import {
@@ -12,6 +14,7 @@ import {
   Collection as ChallengeInviteCollection,
   ChallengeInviteStatus,
 } from '../../imports/models/challenge_invites';
+import { sendEmail, EMAIL_TEMPLATES } from '../lib/email';
 
 Meteor.methods({
   'challenge.create': ({
@@ -29,7 +32,10 @@ Meteor.methods({
       _id: uuid.v4(),
     });
   },
-  'challenge.invite': ({ email, challengeId }: ChallengeInviteOptions) => {
+  'challenge.invite': async ({
+    email,
+    challengeId,
+  }: ChallengeInviteOptions) => {
     // TODO: Validation. Typescript helps, but dosen't protect us from maliciousness.
     console.info(`Inviting ${email} to challenge ${challengeId}`);
     const challenge = ChallengeCollection.findOne({ _id: challengeId });
@@ -61,21 +67,41 @@ Meteor.methods({
       );
     }
 
-    // ChallengeInviteCollection.insert({
-    //   _id: uuid.v4(),
-    //   challengeId: challenge._id,
-    //   inviteeId: _.get(invitee, '_id'),
-    //   email,
-    //   createdAt: new Date(),
-    //   updatedAt: new Date(),
-    //   status: ChallengeInviteStatus.PENDING,
-    // });
+    const challengeInviteId = uuid.v4();
+
+    // Insert the object.
+    ChallengeInviteCollection.insert({
+      _id: challengeInviteId,
+      challengeId: challenge._id,
+      inviteeId: _.get(invitee, '_id'),
+      email,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: ChallengeInviteStatus.PENDING,
+    });
 
     // Send the email!
-    if (invitee) {
-      // User is already on the platform, just send them a simple invite.
-    } else {
-      // User is not on the platform yet, this is an opportunity to grow user base.
-    }
+    // TODO: Send different emails depending on whether the user is currently a member yet. New users need
+    // a better introduction.
+    await sendEmail({
+      recipients: [email],
+      templateId: EMAIL_TEMPLATES.CHALLENGE_INVITE,
+      substitutions: {
+        inviter: Meteor.user().profile,
+        acceptUrl: buildAcceptUrl(challengeInviteId),
+        challenge,
+      },
+    });
   },
 });
+
+function buildAcceptUrl(challengeInviteId: string): string {
+  const baseUrl = Meteor.settings.rootUrl;
+
+  // All of this is basically arbitrary. Just vaguely disguising how this mechanism works for no good reason.
+  const param = base64(JSON.stringify({ challengeInviteId }));
+  const acceptUrl = new url.URL('/accept-invite', baseUrl);
+  acceptUrl.search = `_p=${param}`;
+
+  return acceptUrl.toString();
+}
