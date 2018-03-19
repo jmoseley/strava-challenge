@@ -7,3 +7,5 @@ Create public/private challenges for you and your friends.
 1. Install Meteor: https://www.meteor.com/install
 1. Install dependencies: `meteor npm install`
 1. Run: `meteor --port 8765 --setings config/development.json`.
+
+### Sending Email
