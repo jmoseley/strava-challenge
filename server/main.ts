@@ -45,14 +45,6 @@ Meteor.publish('challenges', () => {
     ],
   }).fetch();
 
-  console.log(
-    'challengeInvites',
-    _(challengeInvites)
-      .map(ci => ci.challengeId)
-      .uniq()
-      .value(),
-  );
-
   return ChallengesCollection.find({
     $or: [
       { creatorId: Meteor.userId() },

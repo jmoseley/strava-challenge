@@ -104,6 +104,20 @@ Meteor.methods({
       );
     }
 
+    // Prevent multiple invites.
+    const existingChallengeInvite = ChallengeInviteCollection.findOne({
+      $and: [
+        { challengeId: challenge._id },
+        {
+          $or: [{ email }, { inviteeId: invitee._id }],
+        },
+      ],
+    });
+    if (existingChallengeInvite) {
+      console.info(`There is already an outstanding invite for this user.`);
+      return;
+    }
+
     const challengeInviteId = uuid.v4();
 
     // Insert the object.

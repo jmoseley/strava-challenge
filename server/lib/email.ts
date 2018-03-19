@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as sendgrid from '@sendgrid/mail';
 
 if (process.env.SENDGRID_API_KEY) {
-  sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+  sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 }
 sendgrid.setSubstitutionWrappers('{{', '}}');
 
