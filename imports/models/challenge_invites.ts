@@ -9,12 +9,18 @@ export const Collection = new Mongo.Collection<ChallengeInvite>(
   'challenge_invites',
 );
 
+export enum ChallengeInviteStatus {
+  PENDING = 'PENDING',
+  FULFILLED = 'FULFILLED',
+}
+
 export interface ChallengeInvite
   extends ChallengeInviteCreateOptions,
     BaseModel {}
 
 export interface ChallengeInviteCreateOptions {
-  inviteeId: string;
-  challengeId?: string;
+  challengeId: string;
+  inviteeId?: string;
   email?: string;
+  status: ChallengeInviteStatus;
 }
