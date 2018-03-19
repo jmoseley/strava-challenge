@@ -8,6 +8,7 @@ import { JsonRoutes } from 'fine-rest';
 import StravaProviderDAO from './providers/strava';
 import { Collection as ActivitiesCollection } from '../imports/models/activities';
 import { Collection as ChallengesCollection } from '../imports/models/challenges';
+import { Collection as ChallengeInvitesCollection } from '../imports/models/challenge_invites';
 import { runJob } from './lib/jobs';
 import { SYNC_USER_ACTIVITIES_JOB_ID, syncUserActivities } from './jobs';
 
@@ -37,6 +38,16 @@ Meteor.publish('activities', () => {
 Meteor.publish('challenges', () => {
   return ChallengesCollection.find({
     $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+  });
+});
+
+Meteor.publish('challengeInvites', () => {
+  return ChallengeInvitesCollection.find({
+    $or: [
+      { email: _.get(Meteor.user(), 'profile.email') },
+      { email: _.get(Meteor.user(), 'services.strava.email') },
+      { inviteeId: Meteor.userId() },
+    ],
   });
 });
 
