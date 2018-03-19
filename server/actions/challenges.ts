@@ -59,7 +59,7 @@ Meteor.methods({
       );
     }
 
-    console.info(`Accepting invite for user ${Meteor.userId}.`);
+    console.info(`Accepting invite for user ${Meteor.userId()}.`);
     ChallengeInviteCollection.update(
       { _id: challengeInvite._id },
       { status: ChallengeInviteStatus.FULFILLED },
