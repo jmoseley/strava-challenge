@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import * as url from 'url';
 import { Meteor } from 'meteor/meteor';
-import { toBase64Url } from 'b64u-lite';
 
 import {
   Collection as ChallengesCollection,
@@ -39,8 +38,6 @@ Meteor.publish('challenges', () => {
   if (!Meteor.userId() || !challengeInviteCursor) return;
 
   const challengeInvites = challengeInviteCursor.fetch();
-
-  console.log('ci', challengeInvites);
 
   return ChallengesCollection.find({
     $or: [
@@ -185,21 +182,10 @@ Meteor.methods({
       templateId: EMAIL_TEMPLATES.CHALLENGE_INVITE,
       substitutions: {
         inviterName: _.get(Meteor.user(), 'profile.fullName'),
-        acceptUrl: buildAcceptUrl(challengeInviteId),
+        acceptUrl: Meteor.settings.rootUrl,
         challengeName: challenge.name,
         challengeDistanceMiles: challenge.distanceMiles,
       },
     });
   },
 });
-
-function buildAcceptUrl(challengeInviteId: string): string {
-  const baseUrl = Meteor.settings.rootUrl;
-
-  // All of this is basically arbitrary. Just vaguely disguising how this mechanism works for no good reason.
-  const param = toBase64Url(JSON.stringify({ challengeInviteId }));
-  const acceptUrl = new url.URL('/', baseUrl);
-  acceptUrl.search = `_p=${param}`;
-
-  return acceptUrl.toString();
-}

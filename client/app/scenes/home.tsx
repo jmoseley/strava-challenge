@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 // TODO: Meteor is badly typed :(
 import { withTracker } from 'meteor/react-meteor-data';
 import styled from 'styled-components';
-import { fromBase64Url } from 'b64u-lite';
 
 import NavBar from '../components/nav_bar';
 import {

@@ -16,7 +16,6 @@
     "@convoy/dapper": "^2.0.97",
     "@neutrium/quantity": "^3.0.7",
     "@sendgrid/mail": "^6.2.1",
-    "b64u-lite": "^1.0.1",
     "fine-rest": "^2.0.4",
     "lodash": "^4.17.5",
     "meteor-node-stubs": "^0.3.2",
