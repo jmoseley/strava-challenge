@@ -17,18 +17,30 @@ import {
 import { sendEmail, EMAIL_TEMPLATES } from '../lib/email';
 
 function getChallengeInvites() {
+  if (!Meteor.userId()) return;
+
   return ChallengeInvitesCollection.find({
-    $or: [
-      { email: _.get(Meteor.user(), 'profile.email') },
-      { email: _.get(Meteor.user(), 'services.strava.email') },
-      { inviteeId: Meteor.userId() },
+    $and: [
+      { status: ChallengeInviteStatus.PENDING },
+      {
+        $or: [
+          { email: _.get(Meteor.user(), 'profile.email') },
+          { email: _.get(Meteor.user(), 'services.strava.email') },
+          { inviteeId: Meteor.userId() },
+        ],
+      },
     ],
   });
 }
 
 Meteor.publish('challenges', () => {
   // Also publish any challenges related to outstanding invites for this user.
-  const challengeInvites = getChallengeInvites().fetch();
+  const challengeInviteCursor = getChallengeInvites();
+  if (!Meteor.userId() || !challengeInviteCursor) return;
+
+  const challengeInvites = challengeInviteCursor.fetch();
+
+  console.log('ci', challengeInvites);
 
   return ChallengesCollection.find({
     $or: [
