@@ -45,10 +45,17 @@ const STYLES = dapper.compile({
   homepage: {
     padding: '0.5em',
     display: 'flex',
+    justifyContent: 'space-between',
   },
   body: {
     height: '100%',
     fontFamily: `'Roboto', sans-serif`,
+  },
+  recentRides: {
+    flex: '1',
+  },
+  challenges: {
+    flex: '4',
   },
 });
 
@@ -95,11 +102,11 @@ class HomeScene extends React.Component<Props> {
     return (
       <div className={this.styles.homepage}>
         {this._renderChallengeInvite()}
-        <div>
+        <div className={this.styles.challenges}>
           <h2 className={this.styles.heading}>Challenges</h2>
           <div>{this._renderChallenges()}</div>
         </div>
-        <div>
+        <div className={this.styles.recentRides}>
           <h2 className={this.styles.heading}>Recent Rides</h2>
           <div>{this._renderRecentRides()}</div>
         </div>
