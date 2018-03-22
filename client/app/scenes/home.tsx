@@ -43,7 +43,6 @@ const STYLES = dapper.compile({
     fontWeight: 'lighter',
   },
   homepage: {
-    padding: '0.5em',
     display: 'flex',
     justifyContent: 'space-between',
   },
@@ -53,9 +52,14 @@ const STYLES = dapper.compile({
   },
   recentRides: {
     flex: '1',
+    borderLeft: '1px solid lightgrey',
+    marginLeft: '1em',
+    padding: '0.5em',
+    background: '#ffffff',
   },
   challenges: {
     flex: '4',
+    padding: '0.5em',
   },
   challengeWrapper: {
     display: 'flex',
@@ -106,7 +110,6 @@ class HomeScene extends React.Component<Props> {
     return (
       <div className={this.styles.homepage}>
         <div className={this.styles.challenges}>
-          <h2 className={this.styles.heading}>Challenges</h2>
           <div className={this.styles.challengeWrapper}>
             <div>{this._renderChallenges()}</div>
             <div>

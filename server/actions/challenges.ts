@@ -33,37 +33,19 @@ function getChallengeInvitesFilter() {
 }
 
 Meteor.publish('challenges', () => {
-  // Also publish any challenges related to outstanding invites for this user.
-  const filter = getChallengeInvitesFilter();
-  const challengeInvites = ChallengeInvitesCollection.find(filter).fetch();
-
   return ChallengesCollection.find({
-    $or: [
-      { creatorId: Meteor.userId() },
-      { members: Meteor.userId() },
-      {
-        _id: {
-          $in: _(challengeInvites)
-            .map(ci => ci.challengeId)
-            .uniq()
-            .value(),
-        },
-      },
-    ],
+    $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
   });
 });
 
 publishComposite('challengeInvites', {
   find() {
-    console.log('find1');
     const filter = getChallengeInvitesFilter();
-    console.log(JSON.stringify(filter));
     return ChallengeInvitesCollection.find(filter);
   },
   children: [
     {
       find(challengeInvite: ChallengeInvite) {
-        console.log('find for ci', challengeInvite);
         return ChallengesCollection.find({ _id: challengeInvite.challengeId });
       },
     },
