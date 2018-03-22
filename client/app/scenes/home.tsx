@@ -150,24 +150,28 @@ class HomeScene extends React.Component<Props> {
       return;
     }
 
-    return _.map(this.props.challengeInvites, ci => {
-      const challenge = _.find(
-        this.props.challenges,
-        c => c._id === ci.challengeId,
-      );
+    return (
+      <div>
+        <h3>Invites</h3>
+        {_.map(this.props.challengeInvites, ci => {
+          const challenge = _.find(
+            this.props.challenges,
+            c => c._id === ci.challengeId,
+          );
 
-      if (!challenge) {
-        console.error(`Unable to find challenge for challengeInvite`);
-        return;
-      }
+          if (!challenge) {
+            console.error(`Unable to find challenge for challengeInvite`);
+            return;
+          }
 
-      return (
-        <div key={ci._id}>
-          <h3>Invites</h3>
-          <AcceptChallengeCard challenge={challenge} challengeInvite={ci} />
-        </div>
-      );
-    });
+          return (
+            <div key={ci._id}>
+              <AcceptChallengeCard challenge={challenge} challengeInvite={ci} />
+            </div>
+          );
+        })}
+      </div>
+    );
   }
 }
 
