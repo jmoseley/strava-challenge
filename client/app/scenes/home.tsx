@@ -57,6 +57,10 @@ const STYLES = dapper.compile({
   challenges: {
     flex: '4',
   },
+  challengeWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
 });
 
 export interface DataProps {
@@ -103,8 +107,13 @@ class HomeScene extends React.Component<Props> {
       <div className={this.styles.homepage}>
         <div className={this.styles.challenges}>
           <h2 className={this.styles.heading}>Challenges</h2>
-          {this._renderChallengeInvites()}
-          {this._renderChallenges()}
+          <div className={this.styles.challengeWrapper}>
+            <div>{this._renderChallenges()}</div>
+            <div>
+              <CreateChallenge />
+              {this._renderChallengeInvites()}
+            </div>
+          </div>
         </div>
         <div className={this.styles.recentRides}>
           <h2 className={this.styles.heading}>Recent Rides</h2>
@@ -129,7 +138,6 @@ class HomeScene extends React.Component<Props> {
   _renderChallenges() {
     return (
       <div>
-        <CreateChallenge />
         {this.props.challenges.map(challenge => {
           if (!_.includes(challenge.members, Meteor.userId())) return;
 

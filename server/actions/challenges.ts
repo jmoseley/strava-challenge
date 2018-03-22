@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import * as url from 'url';
 import { Meteor } from 'meteor/meteor';
+import { publishComposite } from 'meteor/reywood:publish-composite';
 
 import {
   Collection as ChallengesCollection,
@@ -15,10 +16,8 @@ import {
 } from '../../imports/models/challenge_invites';
 import { sendEmail, EMAIL_TEMPLATES } from '../lib/email';
 
-function getChallengeInvites() {
-  if (!Meteor.userId()) return;
-
-  return ChallengeInvitesCollection.find({
+function getChallengeInvitesFilter() {
+  return {
     $and: [
       { status: ChallengeInviteStatus.PENDING },
       {
@@ -29,15 +28,13 @@ function getChallengeInvites() {
         ],
       },
     ],
-  });
+  };
 }
 
 Meteor.publish('challenges', () => {
   // Also publish any challenges related to outstanding invites for this user.
-  const challengeInviteCursor = getChallengeInvites();
-  if (!Meteor.userId() || !challengeInviteCursor) return;
-
-  const challengeInvites = challengeInviteCursor.fetch();
+  const filter = getChallengeInvitesFilter();
+  const challengeInvites = ChallengeInvitesCollection.find(filter).fetch();
 
   return ChallengesCollection.find({
     $or: [
@@ -56,7 +53,8 @@ Meteor.publish('challenges', () => {
 });
 
 Meteor.publish('challengeInvites', () => {
-  return getChallengeInvites();
+  const filter = getChallengeInvitesFilter();
+  return ChallengeInvitesCollection.find(filter);
 });
 
 Meteor.methods({
