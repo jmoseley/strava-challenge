@@ -5,16 +5,50 @@ import { Meteor } from 'meteor/meteor';
 import { toBase64Url } from 'b64u-lite';
 
 import {
-  Collection as ChallengeCollection,
+  Collection as ChallengesCollection,
   ChallengeCreateOptions,
   ChallengeInviteOptions,
   Errors,
 } from '../../imports/models/challenges';
 import {
-  Collection as ChallengeInviteCollection,
+  Collection as ChallengeInvitesCollection,
   ChallengeInviteStatus,
 } from '../../imports/models/challenge_invites';
 import { sendEmail, EMAIL_TEMPLATES } from '../lib/email';
+
+function getChallengeInvites() {
+  return ChallengeInvitesCollection.find({
+    $or: [
+      { email: _.get(Meteor.user(), 'profile.email') },
+      { email: _.get(Meteor.user(), 'services.strava.email') },
+      { inviteeId: Meteor.userId() },
+    ],
+  });
+}
+
+Meteor.publish('challenges', () => {
+  // Also publish any challenges related to outstanding invites for this user.
+  const challengeInvites = getChallengeInvites().fetch();
+
+  return ChallengesCollection.find({
+    $or: [
+      { creatorId: Meteor.userId() },
+      { members: Meteor.userId() },
+      {
+        _id: {
+          $in: _(challengeInvites)
+            .map(ci => ci.challengeId)
+            .uniq()
+            .value(),
+        },
+      },
+    ],
+  });
+});
+
+Meteor.publish('challengeInvites', () => {
+  return getChallengeInvites();
+});
 
 Meteor.methods({
   'challenge.create': ({
@@ -23,7 +57,7 @@ Meteor.methods({
     newChallenge: ChallengeCreateOptions;
   }) => {
     // TODO: Validation. Typescript helps, but dosen't protect us from maliciousness.
-    ChallengeCollection.insert({
+    ChallengesCollection.insert({
       ...newChallenge,
       members: [Meteor.userId()],
       creatorId: Meteor.userId(),
@@ -37,7 +71,7 @@ Meteor.methods({
   }: {
     challengeInviteId: string;
   }) => {
-    const challengeInvite = ChallengeInviteCollection.findOne({
+    const challengeInvite = ChallengeInvitesCollection.findOne({
       _id: challengeInviteId,
     });
 
@@ -60,11 +94,11 @@ Meteor.methods({
     }
 
     console.info(`Accepting invite for user ${Meteor.userId()}.`);
-    ChallengeInviteCollection.update(
+    ChallengeInvitesCollection.update(
       { _id: challengeInvite._id },
       { status: ChallengeInviteStatus.FULFILLED },
     );
-    ChallengeCollection.update(
+    ChallengesCollection.update(
       { _id: challengeInvite.challengeId },
       { $addToSet: { members: Meteor.userId() } },
     );
@@ -75,7 +109,7 @@ Meteor.methods({
   }: ChallengeInviteOptions) => {
     // TODO: Validation. Typescript helps, but dosen't protect us from maliciousness.
     console.info(`Inviting ${email} to challenge ${challengeId}`);
-    const challenge = ChallengeCollection.findOne({ _id: challengeId });
+    const challenge = ChallengesCollection.findOne({ _id: challengeId });
     if (!challenge) {
       console.info(`Challenge not found.`);
       throw new Meteor.Error(Errors.NOT_FOUND, `Challenge not found.`);
@@ -105,7 +139,7 @@ Meteor.methods({
     }
 
     // Prevent multiple invites.
-    const existingChallengeInvite = ChallengeInviteCollection.findOne({
+    const existingChallengeInvite = ChallengeInvitesCollection.findOne({
       $and: [
         { challengeId: challenge._id },
         {
@@ -121,7 +155,7 @@ Meteor.methods({
     const challengeInviteId = uuid.v4();
 
     // Insert the object.
-    ChallengeInviteCollection.insert({
+    ChallengeInvitesCollection.insert({
       _id: challengeInviteId,
       challengeId: challenge._id,
       inviteeId: _.get(invitee, '_id'),
