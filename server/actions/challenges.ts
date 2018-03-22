@@ -13,6 +13,7 @@ import {
 import {
   Collection as ChallengeInvitesCollection,
   ChallengeInviteStatus,
+  ChallengeInvite,
 } from '../../imports/models/challenge_invites';
 import { sendEmail, EMAIL_TEMPLATES } from '../lib/email';
 
@@ -52,9 +53,21 @@ Meteor.publish('challenges', () => {
   });
 });
 
-Meteor.publish('challengeInvites', () => {
-  const filter = getChallengeInvitesFilter();
-  return ChallengeInvitesCollection.find(filter);
+publishComposite('challengeInvites', {
+  find() {
+    console.log('find1');
+    const filter = getChallengeInvitesFilter();
+    console.log(JSON.stringify(filter));
+    return ChallengeInvitesCollection.find(filter);
+  },
+  children: [
+    {
+      find(challengeInvite: ChallengeInvite) {
+        console.log('find for ci', challengeInvite);
+        return ChallengesCollection.find({ _id: challengeInvite.challengeId });
+      },
+    },
+  ],
 });
 
 Meteor.methods({
