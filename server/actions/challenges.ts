@@ -45,7 +45,7 @@ publishComposite('challenges', {
     {
       find(challenge: Challenge) {
         return ActivitiesCollection.find({
-          userId: challenge.members,
+          userId: { $in: challenge.members },
           // Only pull activities from the last 2 weeks.
           // Eventually challege instances will be stored in the db, and progress will be tracked that way
           // so we aren't recalculating all the time.
@@ -61,9 +61,9 @@ publishComposite('challenges', {
       find(challenge: Challenge) {
         return Meteor.users.find(
           {
-            _id: challenge.members,
+            _id: { $in: challenge.members },
           },
-          { fields: { profile: 1 } },
+          { fields: { profile: 1, _id: 1 } },
         );
       },
     },

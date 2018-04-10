@@ -30,10 +30,10 @@ export default class ChallengeProgressDisplay extends React.Component<Props> {
     const percentageText = (percentage * 100).toFixed(2);
 
     return (
-      <span>
+      <div>
         {this.props.user.profile.name}: {totalMiles.toFixed(1)} miles -{' '}
         {percentageText}%
-      </span>
+      </div>
     );
   }
 
