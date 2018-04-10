@@ -15,7 +15,6 @@ export interface Props {
 
 export default class ChallengeProgressDisplay extends React.Component<Props> {
   render() {
-    console.log(`Render progress for ${this.props.user._id}`);
     const totalMiles = _.reduce(
       this.props.user.activities,
       (sum, a) => {
