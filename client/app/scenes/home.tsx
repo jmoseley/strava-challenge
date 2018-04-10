@@ -23,7 +23,9 @@ import {
   ChallengeInviteStatus,
 } from '../../../imports/models/challenge_invites';
 import ActivityCard from '../components/activity_card';
-import ChallengeCard from '../components/challenge_card';
+import ChallengeCard, {
+  ChallengeWithActivities,
+} from '../components/challenge_card';
 import CreateChallenge from '../components/create_challenge';
 import AcceptChallengeCard from '../components/accept_challenge_card';
 import { locationShape } from 'react-router';
@@ -71,7 +73,7 @@ export interface DataProps {
   currentUser: Meteor.User;
   loading?: boolean;
   recentRides: Activity[];
-  challenges: Challenge[];
+  challenges: ChallengeWithActivities[];
   challengeInvites: ChallengeInvite[];
 }
 
@@ -193,6 +195,7 @@ const mapStateToProps = (state: any) => ({
 
 function dataLoader(p: PropParams): DataProps {
   const activitiesSub = Meteor.subscribe('activities');
+  const challengeActivitiesSub = Meteor.subscribe('challengeActivities');
   const challengesSub = Meteor.subscribe('challenges');
   const challengeInvitesSub = Meteor.subscribe('challengeInvites');
 
@@ -201,19 +204,27 @@ function dataLoader(p: PropParams): DataProps {
     { sort: { startDate: 1 }, limit: 5 },
   ).fetch();
   const challenges = ChallengesCollection.find().fetch();
+  const activities = ActivitiesCollection.find().fetch();
+  const challengesWithActivities = _.map(challenges, c => {
+    return {
+      ...c,
+      activities: _.filter(activities, a => _.includes(c.members, a.userId)),
+    };
+  });
 
   return {
     loading:
       !activitiesSub.ready() ||
       !challengesSub.ready() ||
-      !challengeInvitesSub.ready(),
+      !challengeInvitesSub.ready() ||
+      !challengeActivitiesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
     recentRides: ActivitiesCollection.find(
-      {},
+      { userId: Meteor.userId() },
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
-    challenges,
     challengeInvites,
+    challenges: challengesWithActivities,
   };
 }
 

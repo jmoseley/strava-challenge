@@ -43,13 +43,18 @@ publishComposite('challenges', {
   },
   children: [
     {
+      collectionName: 'challengeActivities',
       find(challenge: Challenge) {
         return ActivitiesCollection.find({
           userId: challenge.members,
           // Only pull activities from the last 5 weeks.
           // Eventually challege instances will be stored in the db, and progress will be tracked that way
           // so we aren't recalculating all the time.
-          startDate: { $gt: moment().subtract(5, 'weeks') },
+          startDate: {
+            $gt: moment()
+              .subtract(5, 'weeks')
+              .toDate(),
+          },
         });
       },
     },

@@ -5,6 +5,7 @@ import { Quantity } from '@neutrium/quantity';
 
 import { Challenge } from '../../../imports/models/challenges';
 import InviteToChallengeForm from './invite_to_challenge_form';
+import { Activity } from '../../../imports/models/activities';
 
 const STYLES = dapper.compile({
   challenge: {
@@ -18,8 +19,12 @@ const STYLES = dapper.compile({
   },
 });
 
+export interface ChallengeWithActivities extends Challenge {
+  activities?: Activity[];
+}
+
 export interface Props {
-  challenge: Challenge;
+  challenge: ChallengeWithActivities;
 }
 
 export default class ChallengeCard extends React.Component<Props> {
