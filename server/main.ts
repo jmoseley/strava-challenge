@@ -10,7 +10,12 @@ import { Collection as ActivitiesCollection } from '../imports/models/activities
 import { Collection as ChallengesCollection } from '../imports/models/challenges';
 import { Collection as ChallengeInvitesCollection } from '../imports/models/challenge_invites';
 import { runJob } from './lib/jobs';
-import { SYNC_USER_ACTIVITIES_JOB_ID, syncUserActivities } from './jobs';
+import {
+  SYNC_USER_ACTIVITIES_JOB_ID,
+  syncUserActivities,
+  SYNC_USER_RELATIONSHIPS_JOB_ID,
+  syncUserRelationships,
+} from './jobs';
 
 // Start all the jobs.
 import './jobs';
@@ -28,11 +33,23 @@ Accounts.onLogin((loginOptions: { type: string; user: Meteor.User }) => {
         userId,
       },
     });
+
+    // Check for friends and sync user relationships.
+    runJob({
+      name: `loginUser-${SYNC_USER_RELATIONSHIPS_JOB_ID}`,
+      job: syncUserRelationships,
+      args: { userId },
+    });
   }
 });
 
 Meteor.publish('activities', () => {
   return ActivitiesCollection.find({ userId: Meteor.userId() });
+});
+
+Meteor.publish(`friends`, () => {
+  // If friendships ever become unbalanced this will break.
+  return Meteor.users.find({ friends: Meteor.userId() });
 });
 
 JsonRoutes.add('GET', '/status', (req: Request, res: Response) => {
