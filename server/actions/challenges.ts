@@ -1,10 +1,13 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import * as uuid from 'uuid';
 import * as url from 'url';
 import { Meteor } from 'meteor/meteor';
 import { publishComposite } from 'meteor/reywood:publish-composite';
 
+import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 import {
+  Challenge,
   Collection as ChallengesCollection,
   ChallengeCreateOptions,
   ChallengeInviteOptions,
@@ -32,10 +35,39 @@ function getChallengeInvitesFilter() {
   };
 }
 
-Meteor.publish('challenges', () => {
-  return ChallengesCollection.find({
-    $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
-  });
+publishComposite('challenges', {
+  find() {
+    return ChallengesCollection.find({
+      $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+    });
+  },
+  children: [
+    {
+      find(challenge: Challenge) {
+        return ActivitiesCollection.find({
+          userId: challenge.members,
+          // Only pull activities from the last 2 weeks.
+          // Eventually challege instances will be stored in the db, and progress will be tracked that way
+          // so we aren't recalculating all the time.
+          startDate: {
+            $gt: moment()
+              .subtract(2, 'weeks')
+              .toDate(),
+          },
+        });
+      },
+    },
+    {
+      find(challenge: Challenge) {
+        return Meteor.users.find(
+          {
+            _id: challenge.members,
+          },
+          { fields: { profile: 1 } },
+        );
+      },
+    },
+  ],
 });
 
 publishComposite('challengeInvites', {

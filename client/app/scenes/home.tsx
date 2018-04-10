@@ -23,7 +23,9 @@ import {
   ChallengeInviteStatus,
 } from '../../../imports/models/challenge_invites';
 import ActivityCard from '../components/activity_card';
-import ChallengeCard from '../components/challenge_card';
+import ChallengeCard, {
+  ChallengeWithUsersAndActivities,
+} from '../components/challenge_card';
 import CreateChallenge from '../components/create_challenge';
 import AcceptChallengeCard from '../components/accept_challenge_card';
 import { locationShape } from 'react-router';
@@ -71,7 +73,7 @@ export interface DataProps {
   currentUser: Meteor.User;
   loading?: boolean;
   recentRides: Activity[];
-  challenges: Challenge[];
+  challenges: ChallengeWithUsersAndActivities[];
   challengeInvites: ChallengeInvite[];
 }
 
@@ -201,6 +203,20 @@ function dataLoader(p: PropParams): DataProps {
     { sort: { startDate: 1 }, limit: 5 },
   ).fetch();
   const challenges = ChallengesCollection.find().fetch();
+  const activities = ActivitiesCollection.find().fetch();
+  const users = Meteor.users.find().fetch();
+  const challengesWithActivities = _.map(challenges, c => {
+    return {
+      ...c,
+      users: _(users)
+        .filter(u => _.includes(c.members, u._id))
+        .map(u => ({
+          ...u,
+          activities: _.filter(activities, a => a.userId === u._id),
+        }))
+        .value(),
+    };
+  });
 
   return {
     loading:
@@ -209,11 +225,11 @@ function dataLoader(p: PropParams): DataProps {
       !challengeInvitesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
     recentRides: ActivitiesCollection.find(
-      {},
+      { userId: Meteor.userId() },
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
-    challenges,
     challengeInvites,
+    challenges: challengesWithActivities,
   };
 }
 
