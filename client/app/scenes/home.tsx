@@ -24,7 +24,7 @@ import {
 } from '../../../imports/models/challenge_invites';
 import ActivityCard from '../components/activity_card';
 import ChallengeCard, {
-  ChallengeWithActivities,
+  ChallengeWithUsersAndActivities,
 } from '../components/challenge_card';
 import CreateChallenge from '../components/create_challenge';
 import AcceptChallengeCard from '../components/accept_challenge_card';
@@ -73,7 +73,7 @@ export interface DataProps {
   currentUser: Meteor.User;
   loading?: boolean;
   recentRides: Activity[];
-  challenges: ChallengeWithActivities[];
+  challenges: ChallengeWithUsersAndActivities[];
   challengeInvites: ChallengeInvite[];
 }
 
@@ -195,7 +195,6 @@ const mapStateToProps = (state: any) => ({
 
 function dataLoader(p: PropParams): DataProps {
   const activitiesSub = Meteor.subscribe('activities');
-  const challengeActivitiesSub = Meteor.subscribe('challengeActivities');
   const challengesSub = Meteor.subscribe('challenges');
   const challengeInvitesSub = Meteor.subscribe('challengeInvites');
 
@@ -205,10 +204,17 @@ function dataLoader(p: PropParams): DataProps {
   ).fetch();
   const challenges = ChallengesCollection.find().fetch();
   const activities = ActivitiesCollection.find().fetch();
+  const users = Meteor.users.find().fetch();
   const challengesWithActivities = _.map(challenges, c => {
     return {
       ...c,
-      activities: _.filter(activities, a => _.includes(c.members, a.userId)),
+      users: _(users)
+        .filter(u => _.includes(c.members, u._id))
+        .map(u => ({
+          ...u,
+          activities: _.filter(activities, a => a.userId === u._id),
+        }))
+        .value(),
     };
   });
 
@@ -216,8 +222,7 @@ function dataLoader(p: PropParams): DataProps {
     loading:
       !activitiesSub.ready() ||
       !challengesSub.ready() ||
-      !challengeInvitesSub.ready() ||
-      !challengeActivitiesSub.ready(),
+      !challengeInvitesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
     recentRides: ActivitiesCollection.find(
       { userId: Meteor.userId() },

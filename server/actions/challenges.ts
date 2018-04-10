@@ -43,19 +43,28 @@ publishComposite('challenges', {
   },
   children: [
     {
-      collectionName: 'challengeActivities',
       find(challenge: Challenge) {
         return ActivitiesCollection.find({
           userId: challenge.members,
-          // Only pull activities from the last 5 weeks.
+          // Only pull activities from the last 2 weeks.
           // Eventually challege instances will be stored in the db, and progress will be tracked that way
           // so we aren't recalculating all the time.
           startDate: {
             $gt: moment()
-              .subtract(5, 'weeks')
+              .subtract(2, 'weeks')
               .toDate(),
           },
         });
+      },
+    },
+    {
+      find(challenge: Challenge) {
+        return Meteor.users.find(
+          {
+            _id: challenge.members,
+          },
+          { fields: { profile: 1 } },
+        );
       },
     },
   ],
