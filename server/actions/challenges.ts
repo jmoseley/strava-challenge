@@ -177,7 +177,7 @@ Meteor.methods({
       $and: [
         { challengeId: challenge._id },
         {
-          $or: [{ email }, { inviteeId: invitee._id }],
+          $or: [{ email }, { inviteeId: _.get(invitee, '_id') }],
         },
       ],
     });
