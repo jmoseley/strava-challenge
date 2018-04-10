@@ -14,7 +14,7 @@ export interface SyncUserActivitiesArgs extends RunArguments {
 }
 
 export async function syncUserActivities(
-  args: RunArguments,
+  args: SyncUserActivitiesArgs,
 ): Promise<JobResult> {
   console.info(`Syncing user activities with args: ${JSON.stringify(args)}`);
   let users: Meteor.User[];
@@ -32,14 +32,14 @@ export async function syncUserActivities(
           {
             $or: [
               {
-                lastSyncedAt: {
+                lastSyncedActivitiesAt: {
                   $lt: moment()
                     .subtract(10, 'minutes')
                     .toDate(),
                 },
               },
               {
-                lastSyncedAt: { $exists: false },
+                lastSyncedActivitiesAt: { $exists: false },
               },
             ],
           },
@@ -74,11 +74,11 @@ export async function syncUserActivities(
       }),
     );
 
-    console.info(`Upadting lastSyncedAt for ${user._id}.`);
+    console.info(`Upadting lastSyncedActivitiesAt for ${user._id}.`);
 
     Meteor.users.update(
       { _id: user._id },
-      { $set: { lastSyncedAt: new Date() } },
+      { $set: { lastSyncedActivitiesAt: new Date() } },
     );
   }
 

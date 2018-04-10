@@ -11,7 +11,13 @@ import {
   Activity,
   Collection as ActivitiesCollection,
 } from '../../../imports/models/activities';
+import {
+  Challenge,
+  Collection as ChallengesCollection,
+} from '../../../imports/models/challenges';
 import ActivityCard from '../components/activity_card';
+import ChallengeCard from '../components/challenge_card';
+import CreateChallenge from '../components/create_challenge';
 
 const CoverWrapper = styled.div`
   margin: 0;
@@ -25,14 +31,15 @@ const Cover = styled.img`
 const STYLES = dapper.compile({
   heading: {
     marginTop: '0.2em',
-    fontFamily: `'Coiny', sans-serif`,
     fontWeight: 'lighter',
   },
   homepage: {
     padding: '0.5em',
+    display: 'flex',
   },
-  bg: {
+  body: {
     height: '100%',
+    fontFamily: `'Roboto', sans-serif`,
   },
 });
 
@@ -40,6 +47,7 @@ export interface DataProps {
   currentUser: Meteor.User;
   loading?: boolean;
   recentRides: Activity[];
+  challenges: Challenge[];
 }
 
 export interface StateProps {
@@ -53,7 +61,7 @@ class HomeScene extends React.Component<Props> {
 
   render() {
     return (
-      <div className={this.styles.bg}>
+      <div className={this.styles.body}>
         <NavBar currentUser={this.props.currentUser} />
         {this._renderCover()}
         {this._renderUserData()}
@@ -66,10 +74,20 @@ class HomeScene extends React.Component<Props> {
       return null;
     }
 
+    if (this.props.loading) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div className={this.styles.homepage}>
-        <h2 className={this.styles.heading}>Recent Rides</h2>
-        <div>{this._renderActivities()}</div>
+        <div>
+          <h2 className={this.styles.heading}>Challenges</h2>
+          <div>{this._renderChallenges()}</div>
+        </div>
+        <div>
+          <h2 className={this.styles.heading}>Recent Rides</h2>
+          <div>{this._renderRecentRides()}</div>
+        </div>
       </div>
     );
   }
@@ -86,11 +104,18 @@ class HomeScene extends React.Component<Props> {
     );
   }
 
-  _renderActivities() {
-    if (this.props.loading) {
-      return <div>Loading...</div>;
-    }
+  _renderChallenges() {
+    return (
+      <div>
+        <CreateChallenge />
+        {this.props.challenges.map(challenge => {
+          return <ChallengeCard challenge={challenge} key={challenge._id} />;
+        })}
+      </div>
+    );
+  }
 
+  _renderRecentRides() {
     return this.props.recentRides.map(activity => {
       return <ActivityCard activity={activity} key={activity._id} />;
     });
@@ -104,14 +129,18 @@ const mapStateToProps = (state: any) => ({
 
 function dataLoader(): DataProps {
   const activitiesSub = Meteor.subscribe('activities');
+  const challengesSub = Meteor.subscribe('challenges');
 
   return {
-    loading: !activitiesSub.ready(),
+    loading: !activitiesSub.ready() || !challengesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
     recentRides: ActivitiesCollection.find(
       {},
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
+    challenges: ChallengesCollection.find({
+      $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+    }).fetch(),
   };
 }
 

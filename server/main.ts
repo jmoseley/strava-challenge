@@ -7,6 +7,7 @@ import { JsonRoutes } from 'fine-rest';
 
 import StravaProviderDAO from './providers/strava';
 import { Collection as ActivitiesCollection } from '../imports/models/activities';
+import { Collection as ChallengesCollection } from '../imports/models/challenges';
 import { runJob } from './lib/jobs';
 import { SYNC_USER_ACTIVITIES_JOB_ID, syncUserActivities } from './jobs';
 
@@ -31,6 +32,12 @@ Accounts.onLogin((loginOptions: { type: string; user: Meteor.User }) => {
 
 Meteor.publish('activities', () => {
   return ActivitiesCollection.find({ userId: Meteor.userId() });
+});
+
+Meteor.publish('challenges', () => {
+  return ChallengesCollection.find({
+    $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+  });
 });
 
 JsonRoutes.add('GET', '/status', (req: Request, res: Response) => {

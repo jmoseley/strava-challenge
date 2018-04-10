@@ -7,9 +7,9 @@ import { createStore, combineReducers } from 'redux';
 import { combineInteractions } from 'redux-interactions';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
+import { reducer as formReducer } from 'redux-form';
 
 import Home from './scenes/home';
-import Activities from './scenes/activities';
 
 const store = createStore(
   combineReducers({
@@ -17,6 +17,7 @@ const store = createStore(
       // Eventually we'll have some interactions.
     }),
     routing: routerReducer,
+    form: formReducer,
   }),
 );
 
@@ -28,7 +29,6 @@ Meteor.startup(function() {
       <Router history={history}>
         <Route path="/">
           <IndexRoute component={Home} />
-          <Route path="activities" component={Activities} />
         </Route>
       </Router>
     </Provider>,

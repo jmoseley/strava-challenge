@@ -48,7 +48,7 @@ export default class LoginButton extends React.Component<Props> {
         <span onClick={this._login}>
           <img
             className={this.styles.button}
-            src="/imgs/btn_strava_connectwith_orange@2x.png"
+            src="/imgs/btn_strava_connectwith_light.png"
           />
         </span>
       );
@@ -60,6 +60,8 @@ export default class LoginButton extends React.Component<Props> {
   }
 
   _login() {
-    (Meteor as any).loginWithStrava();
+    (Meteor as any).loginWithStrava({
+      requestPermissions: ['public', 'view_private'],
+    });
   }
 }
