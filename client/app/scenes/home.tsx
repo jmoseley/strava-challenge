@@ -1,10 +1,13 @@
+import * as _ from 'lodash';
 import * as dapper from '@convoy/dapper';
 import * as React from 'react';
+import * as querystring from 'querystring';
 import { Meteor } from 'meteor/meteor';
 import { connect } from 'react-redux';
 // TODO: Meteor is badly typed :(
 import { withTracker } from 'meteor/react-meteor-data';
 import styled from 'styled-components';
+import { fromBase64Url } from 'b64u-lite';
 
 import NavBar from '../components/nav_bar';
 import {
@@ -15,9 +18,15 @@ import {
   Challenge,
   Collection as ChallengesCollection,
 } from '../../../imports/models/challenges';
+import {
+  ChallengeInvite,
+  Collection as ChallengeInvitesCollection,
+} from '../../../imports/models/challenge_invites';
 import ActivityCard from '../components/activity_card';
 import ChallengeCard from '../components/challenge_card';
 import CreateChallenge from '../components/create_challenge';
+import AcceptChallengeCard from '../components/accept_challenge_card';
+import { locationShape } from 'react-router';
 
 const CoverWrapper = styled.div`
   margin: 0;
@@ -48,13 +57,18 @@ export interface DataProps {
   loading?: boolean;
   recentRides: Activity[];
   challenges: Challenge[];
+  challengeInvite?: ChallengeInvite;
 }
 
 export interface StateProps {
   foo: string;
 }
 
-export interface Props extends DataProps, StateProps {}
+export interface PropParams {
+  location: typeof locationShape;
+}
+
+export interface Props extends DataProps, StateProps, PropParams {}
 
 class HomeScene extends React.Component<Props> {
   styles: any = dapper.reactTo(this, STYLES);
@@ -80,6 +94,7 @@ class HomeScene extends React.Component<Props> {
 
     return (
       <div className={this.styles.homepage}>
+        {this._renderChallengeInvite()}
         <div>
           <h2 className={this.styles.heading}>Challenges</h2>
           <div>{this._renderChallenges()}</div>
@@ -120,6 +135,32 @@ class HomeScene extends React.Component<Props> {
       return <ActivityCard activity={activity} key={activity._id} />;
     });
   }
+
+  _renderChallengeInvite() {
+    if (!this.props.challengeInvite) {
+      return;
+    }
+
+    const challenge = _.find(
+      this.props.challenges,
+      c => c._id === _.get(this, 'props.challengeInvite.challengeId'),
+    );
+
+    if (!challenge) {
+      console.error(`Unable to find challenge for challengeInvite`);
+      return;
+    }
+
+    return (
+      <div>
+        <h3>Accept Challenge</h3>
+        <AcceptChallengeCard
+          challenge={challenge}
+          challengeInvite={this.props.challengeInvite}
+        />
+      </div>
+    );
+  }
 }
 
 // POC that the redux connection works.
@@ -127,9 +168,29 @@ const mapStateToProps = (state: any) => ({
   foo: 'bar',
 });
 
-function dataLoader(): DataProps {
+function dataLoader(p: PropParams): DataProps {
   const activitiesSub = Meteor.subscribe('activities');
   const challengesSub = Meteor.subscribe('challenges');
+  const challengeInvitesSub = Meteor.subscribe('challengeInvites');
+
+  const queryParamsString: string = p.location.search as any;
+
+  const queryParams = querystring.parse(queryParamsString.replace('?', ''));
+
+  let challengeInvite: ChallengeInvite | undefined;
+
+  if (Meteor.userId() && queryParams._p) {
+    try {
+      const decodedObject = fromBase64Url(queryParams._p as string);
+      const parsedObject = JSON.parse(decodedObject);
+
+      challengeInvite = ChallengeInvitesCollection.findOne({
+        _id: parsedObject.challengeInviteId,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return {
     loading: !activitiesSub.ready() || !challengesSub.ready(),
@@ -139,8 +200,13 @@ function dataLoader(): DataProps {
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
     challenges: ChallengesCollection.find({
-      $or: [{ creatorId: Meteor.userId() }, { members: Meteor.userId() }],
+      $or: [
+        { creatorId: Meteor.userId() },
+        { members: Meteor.userId() },
+        { _id: _.get(challengeInvite, 'challengeId') },
+      ],
     }).fetch(),
+    challengeInvite,
   };
 }
 

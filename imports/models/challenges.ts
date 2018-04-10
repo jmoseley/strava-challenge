@@ -7,6 +7,12 @@ import { BaseModel } from './base';
 
 export const Collection = new Mongo.Collection<Challenge>('challenges');
 
+export enum Errors {
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  ALREADY_MEMBER = 'ALREADY_MEMBER',
+}
+
 export interface Challenge extends ChallengeCreateOptions, BaseModel {
   members: string[];
   creatorId: string;
@@ -20,22 +26,7 @@ export interface ChallengeCreateOptions {
   repeats: boolean;
 }
 
-if (Meteor.isServer) {
-  Meteor.methods({
-    'challenge.create': ({
-      newChallenge,
-    }: {
-      newChallenge: ChallengeCreateOptions;
-    }) => {
-      // TODO: Validation. Typescript helps, but dosen't protect us from maliciousness.
-      Collection.insert({
-        ...newChallenge,
-        members: [Meteor.userId()],
-        creatorId: Meteor.userId(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _id: uuid.v4(),
-      });
-    },
-  });
+export interface ChallengeInviteOptions {
+  email: string;
+  challengeId: string;
 }
