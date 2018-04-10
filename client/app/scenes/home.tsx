@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 // TODO: Meteor is badly typed :(
 import { withTracker } from 'meteor/react-meteor-data';
 import styled from 'styled-components';
-import { fromBase64Url } from 'b64u-lite';
 
 import NavBar from '../components/nav_bar';
 import {
@@ -21,6 +20,7 @@ import {
 import {
   ChallengeInvite,
   Collection as ChallengeInvitesCollection,
+  ChallengeInviteStatus,
 } from '../../../imports/models/challenge_invites';
 import ActivityCard from '../components/activity_card';
 import ChallengeCard from '../components/challenge_card';
@@ -43,12 +43,27 @@ const STYLES = dapper.compile({
     fontWeight: 'lighter',
   },
   homepage: {
-    padding: '0.5em',
     display: 'flex',
+    justifyContent: 'space-between',
   },
   body: {
     height: '100%',
     fontFamily: `'Roboto', sans-serif`,
+  },
+  recentRides: {
+    flex: '1',
+    borderLeft: '1px solid lightgrey',
+    marginLeft: '1em',
+    padding: '0.5em',
+    background: '#ffffff',
+  },
+  challenges: {
+    flex: '4',
+    padding: '0.5em',
+  },
+  challengeWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
   },
 });
 
@@ -57,7 +72,7 @@ export interface DataProps {
   loading?: boolean;
   recentRides: Activity[];
   challenges: Challenge[];
-  challengeInvite?: ChallengeInvite;
+  challengeInvites: ChallengeInvite[];
 }
 
 export interface StateProps {
@@ -94,12 +109,16 @@ class HomeScene extends React.Component<Props> {
 
     return (
       <div className={this.styles.homepage}>
-        {this._renderChallengeInvite()}
-        <div>
-          <h2 className={this.styles.heading}>Challenges</h2>
-          <div>{this._renderChallenges()}</div>
+        <div className={this.styles.challenges}>
+          <div className={this.styles.challengeWrapper}>
+            <div>{this._renderChallenges()}</div>
+            <div>
+              <CreateChallenge />
+              {this._renderChallengeInvites()}
+            </div>
+          </div>
         </div>
-        <div>
+        <div className={this.styles.recentRides}>
           <h2 className={this.styles.heading}>Recent Rides</h2>
           <div>{this._renderRecentRides()}</div>
         </div>
@@ -122,8 +141,9 @@ class HomeScene extends React.Component<Props> {
   _renderChallenges() {
     return (
       <div>
-        <CreateChallenge />
         {this.props.challenges.map(challenge => {
+          if (!_.includes(challenge.members, Meteor.userId())) return;
+
           return <ChallengeCard challenge={challenge} key={challenge._id} />;
         })}
       </div>
@@ -136,28 +156,31 @@ class HomeScene extends React.Component<Props> {
     });
   }
 
-  _renderChallengeInvite() {
-    if (!this.props.challengeInvite) {
-      return;
-    }
-
-    const challenge = _.find(
-      this.props.challenges,
-      c => c._id === _.get(this, 'props.challengeInvite.challengeId'),
-    );
-
-    if (!challenge) {
-      console.error(`Unable to find challenge for challengeInvite`);
+  _renderChallengeInvites() {
+    if (!this.props.challengeInvites.length) {
       return;
     }
 
     return (
       <div>
-        <h3>Accept Challenge</h3>
-        <AcceptChallengeCard
-          challenge={challenge}
-          challengeInvite={this.props.challengeInvite}
-        />
+        <h3>Invites</h3>
+        {_.map(this.props.challengeInvites, ci => {
+          const challenge = _.find(
+            this.props.challenges,
+            c => c._id === ci.challengeId,
+          );
+
+          if (!challenge) {
+            console.error(`Unable to find challenge for challengeInvite`);
+            return;
+          }
+
+          return (
+            <div key={ci._id}>
+              <AcceptChallengeCard challenge={challenge} challengeInvite={ci} />
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -173,40 +196,24 @@ function dataLoader(p: PropParams): DataProps {
   const challengesSub = Meteor.subscribe('challenges');
   const challengeInvitesSub = Meteor.subscribe('challengeInvites');
 
-  const queryParamsString: string = p.location.search as any;
-
-  const queryParams = querystring.parse(queryParamsString.replace('?', ''));
-
-  let challengeInvite: ChallengeInvite | undefined;
-
-  if (Meteor.userId() && queryParams._p) {
-    try {
-      const decodedObject = fromBase64Url(queryParams._p as string);
-      const parsedObject = JSON.parse(decodedObject);
-
-      challengeInvite = ChallengeInvitesCollection.findOne({
-        _id: parsedObject.challengeInviteId,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  const challengeInvites = ChallengeInvitesCollection.find(
+    { status: ChallengeInviteStatus.PENDING },
+    { sort: { startDate: 1 }, limit: 5 },
+  ).fetch();
+  const challenges = ChallengesCollection.find().fetch();
 
   return {
-    loading: !activitiesSub.ready() || !challengesSub.ready(),
+    loading:
+      !activitiesSub.ready() ||
+      !challengesSub.ready() ||
+      !challengeInvitesSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
     recentRides: ActivitiesCollection.find(
       {},
       { sort: { startDate: -1 }, limit: 10 },
     ).fetch(),
-    challenges: ChallengesCollection.find({
-      $or: [
-        { creatorId: Meteor.userId() },
-        { members: Meteor.userId() },
-        { _id: _.get(challengeInvite, 'challengeId') },
-      ],
-    }).fetch(),
-    challengeInvite,
+    challenges,
+    challengeInvites,
   };
 }
 

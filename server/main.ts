@@ -35,42 +35,6 @@ Meteor.publish('activities', () => {
   return ActivitiesCollection.find({ userId: Meteor.userId() });
 });
 
-Meteor.publish('challenges', () => {
-  // Also publish any challenges related to outstanding invites for this user.
-  const challengeInvites = ChallengeInvitesCollection.find({
-    $or: [
-      { email: _.get(Meteor.user(), 'profile.email') },
-      { email: _.get(Meteor.user(), 'services.strava.email') },
-      { inviteeId: Meteor.userId() },
-    ],
-  }).fetch();
-
-  return ChallengesCollection.find({
-    $or: [
-      { creatorId: Meteor.userId() },
-      { members: Meteor.userId() },
-      {
-        _id: {
-          $in: _(challengeInvites)
-            .map(ci => ci.challengeId)
-            .uniq()
-            .value(),
-        },
-      },
-    ],
-  });
-});
-
-Meteor.publish('challengeInvites', () => {
-  return ChallengeInvitesCollection.find({
-    $or: [
-      { email: _.get(Meteor.user(), 'profile.email') },
-      { email: _.get(Meteor.user(), 'services.strava.email') },
-      { inviteeId: Meteor.userId() },
-    ],
-  });
-});
-
 JsonRoutes.add('GET', '/status', (req: Request, res: Response) => {
   console.info(`Handling status request.`);
   JsonRoutes.sendResult(res, {
