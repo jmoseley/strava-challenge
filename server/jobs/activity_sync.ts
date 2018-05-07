@@ -79,6 +79,9 @@ export async function syncUserActivities(
           runJob({
             name: `notifyForActivity-${insertedId}`,
             job: ActivityNotification.notifyForActivity,
+            args: {
+              activityId: insertedId,
+            },
           });
         }
       }),

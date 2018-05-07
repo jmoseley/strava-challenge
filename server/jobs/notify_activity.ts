@@ -12,8 +12,13 @@ export interface NotifyForActivityArgs extends RunArguments {
 }
 
 export async function notifyForActivity(
-  args: NotifyForActivityArgs,
+  args?: NotifyForActivityArgs,
 ): Promise<JobResult> {
+  if (!args) {
+    console.error(`Cannot notify without an activityId.`);
+    return JobResult.FAILURE_WITHOUT_RETRY;
+  }
+
   console.info(`Sending notifications for new activity: ${args.activityId}`);
 
   const activity = await ActivitiesCollection.findOne({ _id: args.activityId });
