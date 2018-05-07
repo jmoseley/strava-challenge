@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import * as moment from 'moment';
 
 import { runJob, JobResult, RunArguments } from '../lib/jobs';
+import { ActivityNotification } from './';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
@@ -67,10 +68,21 @@ export async function syncUserActivities(
 
     await Promise.all(
       _.map(activities, async activity => {
-        await ActivitiesCollection.upsert(
+        const result = await ActivitiesCollection.upsert(
           { provider: activity.provider, providerId: activity.providerId },
           { $set: activity },
         );
+        const insertedId = _.get(result, 'insertedId');
+        // Notify if a new activity was inserted.
+        if (insertedId) {
+          runJob({
+            name: `notifyForActivity-${insertedId}`,
+            job: ActivityNotification.notifyForActivity,
+            args: {
+              activityId: insertedId,
+            },
+          });
+        }
       }),
     );
 
