@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import * as util from 'util';
 
 import { runJob, JobResult, RunArguments } from '../lib/jobs';
-import { notifyForActivity } from './';
+import { ActivityNotification } from './';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
@@ -78,7 +78,7 @@ export async function syncUserActivities(
         if (insertedId) {
           runJob({
             name: `notifyForActivity-${insertedId}`,
-            job: notifyForActivity,
+            job: ActivityNotification.notifyForActivity,
           });
         }
       }),

@@ -10,7 +10,7 @@ import { Collection as ActivitiesCollection } from '../imports/models/activities
 import { Collection as ChallengesCollection } from '../imports/models/challenges';
 import { Collection as ChallengeInvitesCollection } from '../imports/models/challenge_invites';
 import { runJob } from './lib/jobs';
-import { SYNC_USER_ACTIVITIES_JOB_ID, syncUserActivities } from './jobs';
+import { ActivitySync } from './jobs';
 
 // Start all the jobs.
 import './jobs';
@@ -19,11 +19,13 @@ Accounts.onLogin((loginOptions: { type: string; user: Meteor.User }) => {
   const userId = _.get(loginOptions, 'user._id');
 
   if (userId) {
+    console.log('user logged in', userId);
+    console.log('sync job name:', ActivitySync.SYNC_USER_ACTIVITIES_JOB_ID);
     // Sync the users activities so we look like we are up to date. This is also done at regular intervals.
     runJob({
       // It's important this name is not the same as the repeating sync job, otherwise we will cancel the repeating version.
-      name: `loginUser-${SYNC_USER_ACTIVITIES_JOB_ID}`,
-      job: syncUserActivities,
+      name: `loginUser-${ActivitySync.SYNC_USER_ACTIVITIES_JOB_ID}-${userId}`,
+      job: ActivitySync.syncUserActivities,
       args: {
         userId,
       },
