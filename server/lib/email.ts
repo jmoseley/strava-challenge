@@ -9,18 +9,29 @@ sendgrid.setSubstitutionWrappers('{{', '}}');
 // TODO: We need a domain!
 const sourceEmail = 'jeremy@jeremymoseley.net';
 
+// This is used in the to field so batch emails are bcc'd and we always get a copy of emails that were sent
+// for debugging purposes.
+const toEmail = 'jeremy+challenge_emails@jeremymoseley.net';
+
 export enum EMAIL_TEMPLATES {
   CHALLENGE_INVITE = 'ee409f8f-4d1b-4b67-ab2f-1df34de5af04',
+  ACTIVITY_NOTIFICATION = '245bf3b2-f527-48a6-89bb-4a289a15aa06',
 }
 
-// So far this is generic for all templates. We should figure out a way to pair the right types to the right
-// template ID.
-// Maybe we want to persist the templates as code? https://github.com/niftylettuce/email-templates
 export interface ChallengeInviteEmailSubstitutions {
   inviterName: string;
   acceptUrl: string;
   challengeName: string;
   challengeDistanceMiles: number;
+}
+
+export interface ActivityNotificationEmailSubstitutions {
+  challengerName: string;
+  challengerMiles: string;
+  // challengerPercentage: string;
+  // receiverMiles: string;
+  // receiverPercentage: string;
+  challengeName: string;
 }
 
 export interface Recipient {
@@ -40,6 +51,17 @@ export async function sendChallengeInviteEmail(
   return await sendEmail(
     sendArgs,
     EMAIL_TEMPLATES.CHALLENGE_INVITE,
+    substitutions,
+  );
+}
+
+export async function sendActivityNotificationEmail(
+  sendArgs: SendEmailArgs,
+  substitutions: ActivityNotificationEmailSubstitutions,
+): Promise<void> {
+  return await sendEmail(
+    sendArgs,
+    EMAIL_TEMPLATES.ACTIVITY_NOTIFICATION,
     substitutions,
   );
 }
@@ -72,7 +94,8 @@ async function sendEmail(
     subject,
     templateId,
     substitutions,
-    to: recipients,
+    to: [toEmail],
+    bcc: recipients,
     from: sourceEmail,
   });
   console.info(`Email send result: ${JSON.stringify(result)}`);
