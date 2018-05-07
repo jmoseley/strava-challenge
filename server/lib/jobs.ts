@@ -11,6 +11,7 @@ import {
 
 export enum JobResult {
   SUCCESS = 'SUCCESS',
+  FAILURE_WITHOUT_RETRY = 'FAILURE_WITHOUT_RETRY',
   RETRY_WITH_DELAY = 'RETRY_WITH_DELAY',
 }
 
@@ -101,6 +102,10 @@ function jobWrapper(
         case JobResult.RETRY_WITH_DELAY:
           console.info(`Retrying (${name}) due to result.`);
           instance.reschedule(repeatRunConfig || {});
+          break;
+        case JobResult.FAILURE_WITHOUT_RETRY:
+          console.info(`Job failed (${name}).`);
+          instance.failed();
           break;
         default:
           console.error(`Unknown job result.`);
