@@ -1,8 +1,10 @@
 import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import * as moment from 'moment';
+import * as util from 'util';
 
 import { runJob, JobResult, RunArguments } from '../lib/jobs';
+import { notifyForActivity } from './';
 import StravaProviderDAO from '../providers/strava';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 
@@ -67,10 +69,18 @@ export async function syncUserActivities(
 
     await Promise.all(
       _.map(activities, async activity => {
-        await ActivitiesCollection.upsert(
+        const result = await ActivitiesCollection.upsert(
           { provider: activity.provider, providerId: activity.providerId },
           { $set: activity },
         );
+        const insertedId = _.get(result, 'insertedId');
+        // Notify if a new activity was inserted.
+        if (insertedId) {
+          runJob({
+            name: `notifyForActivity-${insertedId}`,
+            job: notifyForActivity,
+          });
+        }
       }),
     );
 
