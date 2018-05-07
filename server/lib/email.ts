@@ -16,12 +16,11 @@ export enum EMAIL_TEMPLATES {
 // So far this is generic for all templates. We should figure out a way to pair the right types to the right
 // template ID.
 // Maybe we want to persist the templates as code? https://github.com/niftylettuce/email-templates
-export interface EmailSubstitutions {
+export interface ChallengeInviteEmailSubstitutions {
   inviterName: string;
   acceptUrl: string;
   challengeName: string;
   challengeDistanceMiles: number;
-  [key: string]: any;
 }
 
 export interface Recipient {
@@ -32,16 +31,24 @@ export interface Recipient {
 export interface SendEmailArgs {
   subject?: string;
   recipients: (string | Recipient)[];
-  templateId: EMAIL_TEMPLATES;
-  substitutions: EmailSubstitutions;
 }
 
-export async function sendEmail({
-  subject,
-  recipients,
-  templateId,
-  substitutions,
-}: SendEmailArgs): Promise<void> {
+export async function sendChallengeInviteEmail(
+  sendArgs: SendEmailArgs,
+  substitutions: ChallengeInviteEmailSubstitutions,
+): Promise<void> {
+  return await sendEmail(
+    sendArgs,
+    EMAIL_TEMPLATES.CHALLENGE_INVITE,
+    substitutions,
+  );
+}
+
+async function sendEmail(
+  { subject, recipients }: SendEmailArgs,
+  templateId: string,
+  substitutions: { [key: string]: any },
+): Promise<void> {
   if (!isEmailEnabled()) {
     console.info(`Sending email is disabled.`);
     console.info(`Subject: `, subject);
