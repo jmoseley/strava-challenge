@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import * as moment from 'moment';
-import * as util from 'util';
 
 import { runJob, JobResult, RunArguments } from '../lib/jobs';
 import { ActivityNotification } from './';
