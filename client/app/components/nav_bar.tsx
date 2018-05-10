@@ -3,8 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import * as React from 'react';
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
+import { WithRouterProps, withRouter } from 'react-router';
 
+import Button from './button';
 import LoginButton from '../components/login_button';
+import ProfileButton from '../components/profile_button';
 
 const STYLES = dapper.compile({
   menuWrapper: {
@@ -22,13 +25,18 @@ const STYLES = dapper.compile({
     paddingBottom: '0.1em',
     fontFamily: `'Lobster', sans-serif`,
   },
+  buttons: {
+    display: 'flex',
+  },
 });
 
 export interface Props {
   currentUser: Meteor.User;
+  profileButton?: boolean;
+  homeButton?: boolean;
 }
 
-export default class NavBar extends React.Component<Props> {
+class NavBar extends React.Component<Props & WithRouterProps> {
   // TODO: Fix the types.
   styles: any = dapper.reactTo(this, STYLES);
 
@@ -37,11 +45,22 @@ export default class NavBar extends React.Component<Props> {
       <Headroom>
         <div className={this.styles.menuWrapper}>
           <h1 className={this.styles.header}>Challenge</h1>
-          <span>
+          <div className={this.styles.buttons}>
+            {this.props.currentUser &&
+              this.props.profileButton && <ProfileButton />}
+            {this.props.homeButton && (
+              <Button onClick={this._goHome.bind(this)} label="Home" />
+            )}
             <LoginButton currentUser={this.props.currentUser} />
-          </span>
+          </div>
         </div>
       </Headroom>
     );
   }
+
+  _goHome() {
+    this.props.router.push('/');
+  }
 }
+
+export default withRouter(NavBar);

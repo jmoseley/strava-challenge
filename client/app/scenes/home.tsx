@@ -93,7 +93,7 @@ class HomeScene extends React.Component<Props> {
   render() {
     return (
       <div className={this.styles.body}>
-        <NavBar currentUser={this.props.currentUser} />
+        <NavBar currentUser={this.props.currentUser} profileButton={true} />
         {this._renderCover()}
         {this._renderUserData()}
       </div>
