@@ -5,6 +5,8 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { Blaze } from 'meteor/blaze';
 
+import Button from './button';
+
 // http://www.colourlovers.com/palette/92095/Giant_Goldfish
 const STYLES = dapper.compile({
   button: {
@@ -22,6 +24,9 @@ const STYLES = dapper.compile({
   userName: {
     padding: '5px',
   },
+  container: {
+    display: 'flex',
+  },
 });
 
 export interface Props {
@@ -34,13 +39,13 @@ export default class LoginButton extends React.Component<Props> {
   render() {
     if (this.props.currentUser) {
       return (
-        <div>
-          <span className={this.styles.userName}>
-            {this.props.currentUser.profile.name}
-          </span>
-          <span onClick={this._logout} className={this.styles.logout}>
-            Logout
-          </span>
+        <div className={this.styles.container}>
+          <div>
+            <span className={this.styles.userName}>
+              {this.props.currentUser.profile.name}
+            </span>
+          </div>
+          <Button onClick={this._logout} label="Logout" />
         </div>
       );
     } else {
