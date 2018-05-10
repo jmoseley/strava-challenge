@@ -6,6 +6,7 @@ import {
   NOTIFICATION_EVENTS,
   NOTIFICATION_EVENT_NAMES,
   NOTIFICATION_TYPE_NAMES,
+  SetNotificationPreferencesOptions,
 } from '../../../../imports/preferences';
 
 export interface Props {
@@ -68,7 +69,19 @@ export default class NotificationPreferences extends React.Component<Props> {
     notificationType: NOTIFICATION_TYPES,
     value: boolean,
   ) {
-    console.log('updatePreference', notificationEvent, notificationType, value);
+    const args: SetNotificationPreferencesOptions = {
+      notificationEvent,
+      notificationType,
+      newValue: value,
+    };
+
+    Meteor.call(
+      'preferences.notifications.set',
+      args,
+      (error: Meteor.Error, r: any) => {
+        if (error) alert(error);
+      },
+    );
   }
 }
 

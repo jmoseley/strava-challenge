@@ -15,3 +15,9 @@ export enum NOTIFICATION_TYPES {
 export const NOTIFICATION_TYPE_NAMES = {
   [NOTIFICATION_TYPES.EMAIL]: 'Email',
 };
+
+export interface SetNotificationPreferencesOptions {
+  notificationEvent: NOTIFICATION_EVENTS;
+  notificationType: NOTIFICATION_TYPES;
+  newValue: boolean;
+}

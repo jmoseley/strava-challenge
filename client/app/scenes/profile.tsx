@@ -41,6 +41,7 @@ const STYLES = dapper.compile({
 });
 
 export interface DataProps {
+  loading: boolean;
   currentUser: Meteor.User;
 }
 
@@ -78,7 +79,9 @@ const mapStateToProps = (state: any) => ({
 });
 
 function dataLoader(p: PropParams): DataProps {
+  const userDataSub = Meteor.subscribe('userData');
   return {
+    loading: !userDataSub.ready(),
     currentUser: Meteor.users.findOne({ _id: Meteor.userId() }),
   };
 }
