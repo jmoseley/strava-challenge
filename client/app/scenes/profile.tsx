@@ -9,34 +9,34 @@ import { withTracker } from 'meteor/react-meteor-data';
 import styled from 'styled-components';
 
 import NavBar from '../components/nav_bar';
+import AccountInfo from '../components/profile/account_info';
+import NotificationPreferences from '../components/profile/notification_preferences';
 
 const STYLES = dapper.compile({
   heading: {
     marginTop: '0.2em',
     fontWeight: 'lighter',
   },
-  homepage: {
+  main: {
     display: 'flex',
     justifyContent: 'space-between',
+    height: '100%',
   },
   body: {
     height: '100%',
     fontFamily: `'Roboto', sans-serif`,
   },
-  recentRides: {
+  accountInfo: {
     flex: '1',
     borderLeft: '1px solid lightgrey',
     marginLeft: '1em',
     padding: '0.5em',
     background: '#ffffff',
+    height: '100%',
   },
-  challenges: {
+  preferences: {
     flex: '4',
     padding: '0.5em',
-  },
-  challengeWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
   },
 });
 
@@ -59,9 +59,13 @@ class ProfileScene extends React.Component<Props> {
     return (
       <div className={this.styles.body}>
         <NavBar currentUser={this.props.currentUser} homeButton={true} />
-        <div className={this.styles.homepage}>
-          <div className={this.styles.challenges} />
-          <div className={this.styles.recentRides} />
+        <div className={this.styles.main}>
+          <div className={this.styles.preferences}>
+            <NotificationPreferences user={this.props.currentUser} />
+          </div>
+          <div className={this.styles.accountInfo}>
+            <AccountInfo user={this.props.currentUser} />
+          </div>
         </div>
       </div>
     );
