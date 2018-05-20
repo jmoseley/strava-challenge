@@ -43,6 +43,7 @@ export interface FormData {
 
 export interface Props {
   challengeId: string;
+  onSubmit: () => void;
 }
 
 const onSubmitFactory = (formName: string) => {
@@ -74,6 +75,8 @@ const onSubmitFactory = (formName: string) => {
           throw new Error('Invalid response from server.');
       }
     }
+
+    props.onSubmit();
 
     dispatch(reset(formName));
   };
