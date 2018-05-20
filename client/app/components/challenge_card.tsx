@@ -121,9 +121,14 @@ export default class ChallengeCard extends React.Component<Props, State> {
       [],
     ) as UserWithActivities[]) {
       // Weeks start on Monday.
-      const currentWeekStart = moment()
+      let currentWeekStart = moment()
         .day(1)
         .startOf('day');
+
+      // Check if its sunday, and backup a week if so.
+      if (currentWeekStart.isAfter(moment())) {
+        currentWeekStart = currentWeekStart.subtract(1, 'week');
+      }
       // Filter activities to just the most recent week.
       // Eventually we can display past progress.
       const activities = _.filter(user.activities, a => {
