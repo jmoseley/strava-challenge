@@ -87,6 +87,15 @@ export async function notifyForActivityNotification(
     NOTIFICATION_EVENTS.CHALLENGE_ACTIVITY,
   );
 
+  if (!notificationTypes.length) {
+    console.info(
+      `Not sending notification for user ${receiver._id} and event ${
+        NOTIFICATION_EVENTS.CHALLENGE_INVITE
+      } because the user has no preferences for this event.`,
+    );
+    return;
+  }
+
   // TODO: Eventually include summary information too, like percentage complete and the receivers data as
   // well.
   // TODO: Include suggestions of rides the receiver can do.
