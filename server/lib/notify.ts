@@ -8,7 +8,10 @@ import {
   NOTIFICATION_TYPES,
 } from '../../imports/preferences';
 import { getNotificationTypesForEvent } from '../actions/preferences';
-import { sendChallengeInviteEmail } from './email';
+import {
+  sendChallengeInviteEmail,
+  sendActivityNotificationEmail,
+} from './email';
 
 export async function notifyForChallengeInvite(
   challenge: Challenge,
@@ -74,9 +77,42 @@ export async function notifyForChallengeInvite(
 }
 
 export async function notifyForActivityNotification(
-  challenger: Meteor.User,
+  rider: Meteor.User,
   receiver: Meteor.User,
-  activity: Activity,
+  challengeName: string,
+  activityMiles: string,
 ): Promise<void> {
-  //
+  const notificationTypes = getNotificationTypesForEvent(
+    receiver,
+    NOTIFICATION_EVENTS.CHALLENGE_ACTIVITY,
+  );
+
+  // TODO: Eventually include summary information too, like percentage complete and the receivers data as
+  // well.
+  // TODO: Include suggestions of rides the receiver can do.
+  const notificationDetails = {
+    challengerName: _.get(rider, 'profile.fullName') as string,
+    challengerMiles: activityMiles,
+    challengeName,
+  };
+
+  await Promise.all(
+    _.map(notificationTypes, async nt => {
+      switch (nt) {
+        case NOTIFICATION_TYPES.EMAIL:
+          const email =
+            _.get(receiver, 'profile.email') ||
+            _.get(receiver, 'services.strava.email');
+          return await sendActivityNotificationEmail(
+            {
+              recipient: email,
+            },
+            notificationDetails,
+          );
+        default:
+          console.error(`Unknown notification type ${nt}.`);
+          return;
+      }
+    }),
+  );
 }
