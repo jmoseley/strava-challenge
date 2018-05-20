@@ -19,6 +19,7 @@ import {
   ChallengeInvite,
 } from '../../imports/models/challenge_invites';
 import { sendChallengeInviteEmail, EMAIL_TEMPLATES } from '../lib/email';
+import { notifyForChallengeInvite } from '../lib/notify';
 
 function getChallengeInvitesFilter() {
   return {
@@ -199,19 +200,6 @@ Meteor.methods({
       status: ChallengeInviteStatus.PENDING,
     });
 
-    // Send the email!
-    // TODO: Send different emails depending on whether the user is currently a member yet. New users need
-    // a better introduction.
-    await sendChallengeInviteEmail(
-      {
-        recipients: [email],
-      },
-      {
-        inviterName: _.get(Meteor.user(), 'profile.fullName'),
-        acceptUrl: Meteor.settings.rootUrl,
-        challengeName: challenge.name,
-        challengeDistanceMiles: challenge.distanceMiles,
-      },
-    );
+    await notifyForChallengeInvite(challenge, Meteor.user(), email, invitee);
   },
 });
