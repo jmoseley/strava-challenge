@@ -103,7 +103,8 @@ export default class ChallengeCard extends React.Component<Props, State> {
     this.setState({ showInviteForm: false });
   };
 
-  _deleteChallenge = () => {
+  _deleteChallenge = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
     if (confirm(`Are you sure you want to delete this challenge?`)) {
       Meteor.call('challenge.delete', {
         challengeId: this.props.challenge._id,
