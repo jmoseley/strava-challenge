@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
 import { Challenge } from '../../../imports/models/challenges';
 import { ChallengeInvite } from '../../../imports/models/challenge_invites';
@@ -26,6 +25,5 @@ export default class AcceptChallengeCard extends React.Component<Props> {
     Meteor.call('challenge.accept', {
       challengeInviteId: this.props.challengeInvite._id,
     });
-    browserHistory.push('/');
   }
 }

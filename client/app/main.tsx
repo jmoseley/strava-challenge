@@ -10,6 +10,7 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 
 import Home from './scenes/home';
+import Profile from './scenes/profile';
 
 const store = createStore(
   combineReducers({
@@ -29,6 +30,7 @@ Meteor.startup(function() {
       <Router history={history}>
         <Route path="/">
           <IndexRoute component={Home} />
+          <Route path="profile" component={Profile} />
         </Route>
       </Router>
     </Provider>,
