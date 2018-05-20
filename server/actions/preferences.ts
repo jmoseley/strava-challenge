@@ -7,6 +7,11 @@ import {
   SetNotificationPreferencesOptions,
 } from '../../imports/preferences';
 
+const DEFAULT_NOTIFICATION_PREFERENCES = {
+  [NOTIFICATION_EVENTS.CHALLENGE_INVITE]: [NOTIFICATION_TYPES.EMAIL],
+  [NOTIFICATION_EVENTS.CHALLENGE_ACTIVITY]: [NOTIFICATION_TYPES.EMAIL],
+};
+
 Meteor.publish('userData', function() {
   if (this.userId) {
     return Meteor.users.find(
@@ -20,6 +25,19 @@ Meteor.publish('userData', function() {
   }
 });
 
+export function getNotificationTypesForEvent(
+  user: Meteor.User,
+  notificationEvent: NOTIFICATION_EVENTS,
+): NOTIFICATION_TYPES[] {
+  const preferences = user.preferences || {};
+
+  if (!preferences.notifications) {
+    return DEFAULT_NOTIFICATION_PREFERENCES[notificationEvent];
+  }
+
+  return preferences.notifications[notificationEvent] || [];
+}
+
 Meteor.methods({
   'preferences.notifications.set': ({
     notificationEvent,
@@ -27,16 +45,13 @@ Meteor.methods({
     newValue,
   }: SetNotificationPreferencesOptions) => {
     console.info(
-      `Setting notificatino preference for user ${Meteor.userId()}. ${notificationEvent} ${notificationType} ${newValue ===
+      `Setting notification preference for user ${Meteor.userId()}. ${notificationEvent} ${notificationType} ${newValue ===
         true}`,
     );
     const prefs = Meteor.user().preferences || {};
 
     if (!prefs.notifications) {
-      prefs.notifications = {
-        [NOTIFICATION_EVENTS.CHALLENGE_INVITE]: [NOTIFICATION_TYPES.EMAIL],
-        [NOTIFICATION_EVENTS.CHALLENGE_ACTIVITY]: [NOTIFICATION_TYPES.EMAIL],
-      };
+      prefs.notifications = DEFAULT_NOTIFICATION_PREFERENCES;
     }
 
     if (newValue === true) {

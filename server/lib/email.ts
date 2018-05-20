@@ -9,9 +9,7 @@ sendgrid.setSubstitutionWrappers('{{', '}}');
 // TODO: We need a domain!
 const sourceEmail = 'jeremy@jeremymoseley.net';
 
-// This is used in the to field so batch emails are bcc'd and we always get a copy of emails that were sent
-// for debugging purposes.
-const toEmail = 'jeremy+challenge_emails@jeremymoseley.net';
+const bccEmail = 'jeremy+sentemail@jeremymoseley.net';
 
 export enum EMAIL_TEMPLATES {
   CHALLENGE_INVITE = 'ee409f8f-4d1b-4b67-ab2f-1df34de5af04',
@@ -41,7 +39,7 @@ export interface Recipient {
 
 export interface SendEmailArgs {
   subject?: string;
-  recipients: (string | Recipient)[];
+  recipient: string | Recipient;
 }
 
 export async function sendChallengeInviteEmail(
@@ -67,7 +65,7 @@ export async function sendActivityNotificationEmail(
 }
 
 async function sendEmail(
-  { subject, recipients }: SendEmailArgs,
+  { subject, recipient }: SendEmailArgs,
   templateId: string,
   substitutions: { [key: string]: any },
 ): Promise<void> {
@@ -76,27 +74,29 @@ async function sendEmail(
     console.info(`Subject: `, subject);
     console.info(`Template ID: `, templateId);
     console.info(`Substitutions: `, substitutions);
-    console.info(`Recipients: `, recipients);
+    console.info(`Recipient: `, recipient);
 
     return;
   }
   const devEmail = getDevEmail();
   if (devEmail) {
     console.info(
-      `Dev email target configured, rewriting recipients to ${devEmail}.`,
+      `Dev email target configured, rewriting recipient to ${devEmail}.`,
     );
-    recipients = [devEmail];
+    recipient = devEmail;
   }
   console.info(
-    `Sending email with templateId '${templateId}' to recipients ${recipients}.`,
+    `Sending email with templateId '${templateId}' to recipient ${recipient}.`,
   );
   const result = await sendgrid.send({
     subject,
     templateId,
     substitutions,
-    to: [toEmail],
-    bcc: recipients,
+    to: [recipient],
     from: sourceEmail,
+    // TODO: Remove this.
+    // Send a cc to myself so I hear about all the emails we send.
+    bcc: bccEmail,
   });
   console.info(`Email send result: ${JSON.stringify(result)}`);
 }

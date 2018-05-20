@@ -5,7 +5,7 @@ import { Quantity } from '@neutrium/quantity';
 import { JobResult, RunArguments } from '../lib/jobs';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 import { Collection as ChallengesCollection } from '../../imports/models/challenges';
-import { sendActivityNotificationEmail, EMAIL_TEMPLATES } from '../lib/email';
+import { notifyForActivityNotification } from '../lib/notify';
 
 export interface NotifyForActivityArgs extends RunArguments {
   activityId: string;
@@ -67,27 +67,18 @@ export async function notifyForActivity(
       .find({ _id: { $in: memberIds } })
       .fetch();
 
-    const emails = _(members)
-      .map(
-        member =>
-          _.get(member, 'profile.email') ||
-          _.get(member, 'services.strava.email'),
-      )
-      .compact()
-      .value();
-
     // TODO: Eventually include summary information too, like percentage complete and the receivers data as
     // well.
     // TODO: Include suggestions of rides the receiver can do.
-    await sendActivityNotificationEmail(
-      {
-        recipients: emails,
-      },
-      {
-        challengerName: _.get(challenger, 'profile.fullName'),
-        challengerMiles: activityMiles,
-        challengeName: challenge.name,
-      },
+    await Promise.all(
+      _.map(members, async member => {
+        await notifyForActivityNotification(
+          challenger,
+          member,
+          challenge.name,
+          activityMiles,
+        );
+      }),
     );
   }
 
