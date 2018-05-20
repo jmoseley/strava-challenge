@@ -31,26 +31,62 @@ export interface Props {
   challenge: ChallengeWithUsersAndActivities;
 }
 
-export default class ChallengeCard extends React.Component<Props> {
+export interface State {
+  showInviteForm: boolean;
+}
+
+export default class ChallengeCard extends React.Component<Props, State> {
   styles: any = dapper.reactTo(this, STYLES);
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      showInviteForm: false,
+    };
+  }
 
   render() {
     return (
       <div className={this.styles.challenge}>
         <h3 className={this.styles.title}>{this.props.challenge.name}</h3>
         <span>{this.props.challenge.distanceMiles} miles</span>
-        {this.props.challenge.creatorId === Meteor.userId() && (
-          <InviteToChallengeForm
-            form={`inviteToChallenge-${this.props.challenge._id}`}
-            challengeId={this.props.challenge._id}
-          />
-        )}
+        {this.props.challenge.creatorId === Meteor.userId() &&
+          this._renderOptions()}
         {this._renderParticipants()}
       </div>
     );
   }
 
-  _renderParticipants() {
+  _renderOptions() {
+    return (
+      <div>
+        {this.state.showInviteForm && (
+          <InviteToChallengeForm
+            form={`inviteToChallenge-${this.props.challenge._id}`}
+            challengeId={this.props.challenge._id}
+            onSubmit={this._hideInviteForm}
+          />
+        )}
+        {!this.state.showInviteForm && (
+          <a href="#" onClick={this._showInviteForm}>
+            Invite
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  _showInviteForm = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    this.setState({ showInviteForm: true });
+  };
+
+  _hideInviteForm = () => {
+    this.setState({ showInviteForm: false });
+  };
+
+  _renderParticipants = () => {
     const progressDisplays = [];
 
     for (const user of _.get(
@@ -88,5 +124,5 @@ export default class ChallengeCard extends React.Component<Props> {
         {progressDisplays}
       </div>
     );
-  }
+  };
 }
