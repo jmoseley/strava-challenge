@@ -21,6 +21,10 @@ const STYLES = dapper.compile({
   link: {
     color: 'black',
   },
+  small: {
+    fontSize: '0.8em',
+    paddingRight: '5px',
+  },
 });
 
 export interface ChallengeWithUsersAndActivities extends Challenge {
@@ -69,8 +73,21 @@ export default class ChallengeCard extends React.Component<Props, State> {
           />
         )}
         {!this.state.showInviteForm && (
-          <a href="#" onClick={this._showInviteForm}>
+          <a
+            href="#"
+            className={this.styles.small}
+            onClick={this._showInviteForm}
+          >
             Invite
+          </a>
+        )}
+        {!this.state.showInviteForm && (
+          <a
+            href="#"
+            className={this.styles.small}
+            onClick={this._deleteChallenge}
+          >
+            Delete
           </a>
         )}
       </div>
@@ -84,6 +101,14 @@ export default class ChallengeCard extends React.Component<Props, State> {
 
   _hideInviteForm = () => {
     this.setState({ showInviteForm: false });
+  };
+
+  _deleteChallenge = () => {
+    if (confirm(`Are you sure you want to delete this challenge?`)) {
+      Meteor.call('challenge.delete', {
+        challengeId: this.props.challenge._id,
+      });
+    }
   };
 
   _renderParticipants = () => {

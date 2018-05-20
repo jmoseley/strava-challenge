@@ -100,6 +100,24 @@ Meteor.methods({
       _id: uuid.v4(),
     });
   },
+  'challenge.delete': ({ challengeId }: { challengeId: string }) => {
+    const challenge = ChallengesCollection.findOne({
+      _id: challengeId,
+    });
+
+    if (!challenge) {
+      throw new Meteor.Error(Errors.NOT_FOUND, 'Challenge not found.');
+    }
+
+    if (challenge.creatorId !== Meteor.user()._id) {
+      throw new Meteor.Error(
+        Errors.UNAUTHORIZED,
+        'Only the owner can delete a challenge.',
+      );
+    }
+
+    ChallengesCollection.remove({ _id: challenge._id });
+  },
   'challenge.accept': ({
     challengeInviteId,
   }: {
