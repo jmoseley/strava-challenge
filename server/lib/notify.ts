@@ -40,7 +40,7 @@ export async function notifyForChallengeInvite(
             );
             return await sendChallengeInviteEmail(
               {
-                recipients: [email],
+                recipient: email,
               },
               {
                 inviterName: _.get(inviter, 'profile.fullName'),
@@ -61,7 +61,7 @@ export async function notifyForChallengeInvite(
     // a better introduction.
     return await sendChallengeInviteEmail(
       {
-        recipients: [email],
+        recipient: email,
       },
       {
         inviterName: _.get(inviter, 'profile.fullName'),

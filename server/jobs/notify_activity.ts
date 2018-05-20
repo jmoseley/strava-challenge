@@ -5,7 +5,7 @@ import { Quantity } from '@neutrium/quantity';
 import { JobResult, RunArguments } from '../lib/jobs';
 import { Collection as ActivitiesCollection } from '../../imports/models/activities';
 import { Collection as ChallengesCollection } from '../../imports/models/challenges';
-import { sendActivityNotificationEmail, EMAIL_TEMPLATES } from '../lib/email';
+import { sendActivityNotificationEmail } from '../lib/email';
 
 export interface NotifyForActivityArgs extends RunArguments {
   activityId: string;
@@ -79,16 +79,19 @@ export async function notifyForActivity(
     // TODO: Eventually include summary information too, like percentage complete and the receivers data as
     // well.
     // TODO: Include suggestions of rides the receiver can do.
-    await sendActivityNotificationEmail(
-      {
-        recipients: emails,
-      },
-      {
-        challengerName: _.get(challenger, 'profile.fullName'),
-        challengerMiles: activityMiles,
-        challengeName: challenge.name,
-      },
-    );
+    const notificationDetails = {
+      challengerName: _.get(challenger, 'profile.fullName'),
+      challengerMiles: activityMiles,
+      challengeName: challenge.name,
+    };
+    for (const email of emails) {
+      await sendActivityNotificationEmail(
+        {
+          recipient: email,
+        },
+        notificationDetails,
+      );
+    }
   }
 
   return JobResult.SUCCESS;

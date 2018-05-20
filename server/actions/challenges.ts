@@ -18,7 +18,6 @@ import {
   ChallengeInviteStatus,
   ChallengeInvite,
 } from '../../imports/models/challenge_invites';
-import { sendChallengeInviteEmail, EMAIL_TEMPLATES } from '../lib/email';
 import { notifyForChallengeInvite } from '../lib/notify';
 
 function getChallengeInvitesFilter() {
