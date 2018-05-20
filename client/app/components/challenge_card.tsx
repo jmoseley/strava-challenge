@@ -74,7 +74,7 @@ export default class ChallengeCard extends React.Component<Props, State> {
         )}
         {!this.state.showInviteForm && (
           <a
-            href="#"
+            href={`#invite-${this.props.challenge._id}`}
             className={this.styles.small}
             onClick={this._showInviteForm}
           >
@@ -83,7 +83,7 @@ export default class ChallengeCard extends React.Component<Props, State> {
         )}
         {!this.state.showInviteForm && (
           <a
-            href="#"
+            href={`#delete-${this.props.challenge._id}`}
             className={this.styles.small}
             onClick={this._deleteChallenge}
           >
